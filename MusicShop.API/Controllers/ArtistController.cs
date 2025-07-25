@@ -4,6 +4,7 @@ using MusicShop.API;
 using MusicShop.API.Controllers;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using MusicShop.Domain.Entities;
 
 [ApiController]
 [Route("api/[controller]")]

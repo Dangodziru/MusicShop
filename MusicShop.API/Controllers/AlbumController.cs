@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MusicShop.Data;
+using MusicShop.Domain.Entities;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -7,101 +9,35 @@ namespace MusicShop.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AlbumController(ILogger<AlbumController> logger) : ControllerBase
+    public class AlbumController : ControllerBase
     {
         const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
         const string connectionString = $"Data Source={dbPath};Version=3;";
+        AlbumRepository albumRepository;
+        public AlbumController()
+        {
+            albumRepository = new AlbumRepository();
+        }
 
         [HttpGet("All")]
         public List<Album> GetAll()
         {
-
-            var list = new List<Album>();
-
-            // Создание подключения
-            using (var connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                string sql = "SELECT * FROM Album";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-
-                        list.Add(new Album { Id = (long)reader["AlbumId"], Title = (string)reader["Title"] });
-
-                    }
-                }
-
-            }
-
-            return list;
-
+            var albums =  albumRepository.GetAll();
+            return albums;
         }
 
         [HttpGet("SearchById")]
         public Album? Get(long albumId)
         {
-
-            Album? album = null;
-
-
-            // Создание подключения
-            using (var connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                string sql = "SELECT * FROM Album WHERE AlbumId =" + albumId;
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-
-                        album = new Album { Id = (long)reader["AlbumId"], Title = (string)reader["Title"] };
-
-                    }
-                }
-
-            }
-
+            var album = albumRepository.Get(albumId);
             return album;
-
         }
 
         [HttpGet("Search")]
         public List<Album> Search(string titleSearch)
         {
-
-            var list = new List<Album>();
-
-            // Создание подключения
-            using (var connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                string sql = "SELECT * FROM Album WHERE Title LIKE '%" + titleSearch + "%'";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
-                {
-
-                    while (reader.Read())
-                    {
-
-                        list.Add(new Album { Id = (long)reader["AlbumId"], Title = (string)reader["Title"] });
-
-                    }
-                }
-
-            }
-
-            return list;
+            var albums = albumRepository.Search(titleSearch);
+            return albums;
         }
 
         [HttpPost("InsertAlbum")]
