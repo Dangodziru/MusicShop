@@ -96,5 +96,83 @@ namespace MusicShop.Data
 
             return list;
         }
+
+        public bool DeleteAlbum(long albumId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "DELETE FROM Album WHERE AlbumId = @albumId";
+
+                using (var cmd = new SQLiteCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@albumId", albumId);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        public long? InsertAlbum(string title, long artistId)
+        {
+            long? newId;
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = "INSERT INTO Album(title, ArtistId) VALUES(@title,@artistId); SELECT last_insert_rowid();";
+
+
+                using (var cmd = new SQLiteCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@title", title);
+                    cmd.Parameters.AddWithValue("@artistId", artistId);
+
+                    newId = (long)cmd.ExecuteScalar();
+                }
+            }
+            return newId;
+
+        }
+
+        public bool UpdateAlbum(long albumId, string title, long artistId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string sql = @"
+            UPDATE Album 
+            SET Title = @title, ArtistId = @artistId 
+            WHERE AlbumId = @albumId";
+
+                using (var cmd = new SQLiteCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@title", title);
+                    cmd.Parameters.AddWithValue("@artistId", artistId);
+                    cmd.Parameters.AddWithValue("@albumId", albumId);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
     }
 }

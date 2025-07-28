@@ -5,184 +5,72 @@ using MusicShop.API.Controllers;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using MusicShop.Domain.Entities;
+using MusicShop.Data;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ArtistController(ILogger<ArtistController> logger) : ControllerBase
+public class ArtistController : ControllerBase
 {
-    const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-    const string connectionString = $"Data Source={dbPath};Version=3;";
+
+    ArtistRepository artistRepository;
+    public ArtistController()
+    {
+        artistRepository = new ArtistRepository();
+    }
 
     [HttpGet("All")]
     public List<Artist> GetAll()
     {
-
-        var list = new List<Artist>();
-
-        // Создание подключения
-        using (var connection = new SQLiteConnection(connectionString))
-        {
-            connection.Open();
-
-            string sql = "SELECT * FROM Artist";
-
-            using (var cmd = new SQLiteCommand(sql, connection))
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
-            {
-
-                while (reader.Read())
-                {
-
-                    list.Add(new Artist { ArtistId = (long)reader["ArtistId"], Name = (string)reader["Name"] });
-
-                }
-            }
-
-        }
-
-
-        return list;
-
+        var artists = artistRepository.GetAll();
+        return artists;
     }
     
     [HttpGet("SearchById")]
     public Artist? Get(long artistId)
     {
-
-        Artist? artist = null;
-
-
-        // Создание подключения
-        using (var connection = new SQLiteConnection(connectionString))
-        {
-            connection.Open();
-
-            string sql = "SELECT * FROM Artist WHERE ArtistId =" + artistId;
-
-            using (var cmd = new SQLiteCommand(sql, connection))
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-
-                    artist = new Artist { ArtistId = (long)reader["ArtistId"], Name = (string)reader["Name"] };
-
-                }
-            }
-
-        }
-
+        var artist = artistRepository.Get(artistId);
         return artist;
-
     }
 
     [HttpGet("Search")]
     public List<Artist> Search(string titleSearch)
     {
-
-        var list = new List<Artist>();
-
-        // Создание подключения
-        using (var connection = new SQLiteConnection(connectionString))
-        {
-            connection.Open();
-
-            string sql = "SELECT * FROM Artist WHERE Name LIKE '%" + titleSearch + "%'";
-
-            using (var cmd = new SQLiteCommand(sql, connection))
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
-            {
-
-                while (reader.Read())
-                {
-
-                    list.Add(new Artist { ArtistId = (long)reader["ArtistId"], Name = (string)reader["Name"] });
-
-                }
-            }
-
-        }
-
-        return list;
+        var artists = artistRepository.Search(titleSearch);
+        return artists;
     }
 
     [HttpPost("InsertArtist")]
     public long? InsertArtist(string name)
     {
-        long? newId;
-
-        // Создание подключения
-        using (var connection = new SQLiteConnection(connectionString))
-        {
-            connection.Open();
-
-            string sql = "INSERT INTO Artist(Name, ArtistId) VALUES(@Name,@artistId); SELECT last_insert_rowid();";
-
-
-            using (var cmd = new SQLiteCommand(sql, connection))
-            {
-                cmd.Parameters.AddWithValue("@Name", name);
-
-                newId = (long)cmd.ExecuteScalar();
-            }
-        }
-        return newId;
-
+        var artistId = artistRepository.InsertArtist(name);
+        return artistId;
     }
    
     [HttpDelete("DeleteArtist")]
     public IActionResult DeleteArtist(long artistId)
     {
-        using (var connection = new SQLiteConnection(connectionString))
+        var deleted = artistRepository.DeleteArtist(artistId);
+        if (deleted)
         {
-            connection.Open();
-            string sql = "DELETE FROM Artist WHERE ArtistId = @artistId";
-
-            using (var cmd = new SQLiteCommand(sql, connection))
-            {
-                cmd.Parameters.AddWithValue("@artistId", artistId);
-
-                int rowsAffected = cmd.ExecuteNonQuery();
-
-                if (rowsAffected > 0)
-                {
-                    return Ok($"Artist {artistId} deleted successfully");
-                }
-                else
-                {
-                    return NotFound($"Artist with ID {artistId} not found");
-                }
-            }
+            return Ok($"Artist {artistId} deleted successfully");
+        }
+        else
+        {
+            return NotFound($"Artist with ID {artistId} not found");
         }
     }
    
-    [HttpPost("UpdateAlbum")]
+    [HttpPost("UpdateArtist")]
     public IActionResult UpdateAlbum(long artistId, string name)
     {
-        using (var connection = new SQLiteConnection(connectionString))
+        var updated = artistRepository.UpdateArtist(artistId, name);
+        if (updated)
         {
-            connection.Open();
-            string sql = @"
-            UPDATE Artist 
-            SET Name = @name, ArtistId = @artistId 
-            WHERE ArtistId = @artistId";
-
-            using (var cmd = new SQLiteCommand(sql, connection))
-            {
-                cmd.Parameters.AddWithValue("@title", name);
-                cmd.Parameters.AddWithValue("@artistId", artistId);
-
-                int rowsAffected = cmd.ExecuteNonQuery();
-
-                if (rowsAffected > 0)
-                {
-                    return Ok($"Artist {artistId} updated successfully");
-                }
-                else
-                {
-                    return NotFound($"Artist with ID {artistId} not found");
-                }
-            }
+            return Ok($"Artist {artistId} updated successfully");
+        }
+        else
+        {
+            return NotFound($"Artist with ID {artistId} not found");
         }
     }
 }   
