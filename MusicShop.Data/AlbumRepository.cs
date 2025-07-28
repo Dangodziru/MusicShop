@@ -18,7 +18,7 @@ namespace MusicShop.Data
             {
                 connection.Open();
 
-                string sql = "SELECT * FROM Album";
+                string sql = "SELECT al.*, a.Name FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId ";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -27,7 +27,13 @@ namespace MusicShop.Data
                     while (reader.Read())
                     {
 
-                        list.Add(new Album { Id = (long)reader["AlbumId"], Title = (string)reader["Title"] });
+                        list.Add(new Album {
+                            Id = (long)reader["AlbumId"],
+                            Title = (string)reader["Title"],
+                            ArtistId = (long)reader["ArtistId"],
+                            Artist = new Artist { ArtistId = (long)reader["ArtistId"],
+                                Name = (string)reader["Name"] }
+                        });
 
                     }
                 }
@@ -49,16 +55,26 @@ namespace MusicShop.Data
             {
                 connection.Open();
 
-                string sql = "SELECT * FROM Album WHERE AlbumId =" + albumId;
+                string sql = "SELECT al.*, a.Name FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId WHERE AlbumId = @albumId";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    cmd.Parameters.AddWithValue("@albumId", albumId);
+
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
+                        if (reader.Read())
+                        {
 
-                        album = new Album { Id = (long)reader["AlbumId"], Title = (string)reader["Title"] };
+                            album = new Album
+                            {
+                                Id = (long)reader["AlbumId"],
+                                Title = (string)reader["Title"],
+                                ArtistId = (long)reader["ArtistId"],
+                                Artist = new Artist { ArtistId = (long)reader["ArtistId"], Name = (string)reader["Name"] }
+                            };
 
+                        }
                     }
                 }
 
@@ -78,17 +94,23 @@ namespace MusicShop.Data
             {
                 connection.Open();
 
-                string sql = "SELECT * FROM Album WHERE Title LIKE '%" + titleSearch + "%'";
+                string sql = "SELECT * FROM Album WHERE Title LIKE @titleSearch";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
+                    cmd.Parameters.AddWithValue("@titleSearch", "%"+titleSearch+"%");
 
-                    while (reader.Read())
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
 
-                        list.Add(new Album { Id = (long)reader["AlbumId"], Title = (string)reader["Title"] });
+                        while (reader.Read())
+                        {
 
+                            list.Add(new Album { Id = (long)reader["AlbumId"],
+                                Title = (string)reader["Title"],
+                                ArtistId = (long)reader["ArtistId"] });
+
+                        }
                     }
                 }
 
