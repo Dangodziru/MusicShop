@@ -6,16 +6,17 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using MusicShop.Domain.Entities;
 using MusicShop.Data;
+using MusicShop.Data.Dapper;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ArtistController : ControllerBase
 {
 
-    ArtistRepository artistRepository;
+    IArtistRepository artistRepository;
     public ArtistController()
     {
-        artistRepository = new ArtistRepository();
+        artistRepository = new ArtistDapperRepository();
     }
 
     [HttpGet("All")]

@@ -1,97 +1,53 @@
 ﻿using MusicShop.Domain.Entities;
 using System.Data.SQLite;
+using Dapper;
 
-namespace MusicShop.Data
+namespace MusicShop.Data.Dapper
 {
-    public class AlbumRepository : IAlbumRepository
+    public class AlbumDapperRepository : IAlbumRepository
     {
         const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
         const string connectionString = $"Data Source={dbPath};Version=3;";
 
         public List<Album> GetAll()
         {
-
-            var list = new List<Album>();
-
-            // Создание подключения
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-
-                string sql = "SELECT al.*, a.Name FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId ";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                using (var cmd = new SQLiteCommand(connection))
                 {
-
-                    while (reader.Read())
-                    {
-
-                        list.Add(new Album
-                        {
-                            Id = (long)reader["AlbumId"],
-                            Title = (string)reader["Title"],
-                            ArtistId = (long)reader["ArtistId"],
-
-                            Artist = new Artist
-                            {
-                                ArtistId = (long)reader["ArtistId"],
-                                Name = (string)reader["Name"]
-                            }
-                        });
-
-                    }
+                    return connection.Query<Album, Artist, Album>(
+                        "SELECT al.*, a.* FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId ",
+                        (album, artist) => {
+                            album.Artist = artist;
+                            return album;
+                        },splitOn: "ArtistId"
+                        ).ToList();
+                    
                 }
 
             }
-
-            return list;
-
         }
 
         public Album? Get(long albumId)
         {
-
-            Album? album = null;
-
-
-            // Создание подключения
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
+                const string sql = @"SELECT al.AlbumId, al.Title, al.ArtistId, a.ArtistId, a.Name 
+                    FROM Album al 
+                    JOIN Artist a ON a.ArtistId = al.ArtistId 
+                    WHERE al.AlbumId = @albumId";
 
-                string sql = "SELECT al.*, a.Name FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId WHERE AlbumId = @albumId";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@albumId", albumId);
-
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                return connection.Query<Album, Artist, Album>(
+                    sql,
+                    map: (album, artist) =>
                     {
-                        if (reader.Read())
-                        {
-
-                            album = new Album
-                            {
-                                Id = (long)reader["AlbumId"],
-                                Title = (string)reader["Title"],
-                                ArtistId = (long)reader["ArtistId"],
-
-                                Artist = new Artist
-                                {
-                                    ArtistId = (long)reader["ArtistId"],
-                                    Name = (string)reader["Name"]
-                                }
-                            };
-
-                        }
-                    }
-                }
-
+                        album.Artist = artist;
+                        return album;
+                    },
+                    param: new { albumId },
+                    splitOn: "ArtistId" 
+                ).FirstOrDefault();
             }
-
-            return album;
-
         }
 
         public List<Album> Search(string titleSearch)
@@ -108,7 +64,7 @@ namespace MusicShop.Data
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 {
-                    cmd.Parameters.AddWithValue("@titleSearch", "%" + titleSearch + "%");
+                    cmd.Parameters.AddWithValue("@titleSearch", "%"+titleSearch+"%");
 
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
@@ -116,12 +72,9 @@ namespace MusicShop.Data
                         while (reader.Read())
                         {
 
-                            list.Add(new Album
-                            {
-                                Id = (long)reader["AlbumId"],
+                            list.Add(new Album { Id = (long)reader["AlbumId"],
                                 Title = (string)reader["Title"],
-                                ArtistId = (long)reader["ArtistId"]
-                            });
+                                ArtistId = (long)reader["ArtistId"] });
 
                         }
                     }

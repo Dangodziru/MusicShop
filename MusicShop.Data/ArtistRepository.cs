@@ -3,7 +3,7 @@ using System.Data.SQLite;
 
 namespace MusicShop.Data
 {
-    public class ArtistRepository
+    public class ArtistRepository : IArtistRepository
     {
         const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
         const string connectionString = $"Data Source={dbPath};Version=3;";

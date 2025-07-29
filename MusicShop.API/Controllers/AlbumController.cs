@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.Data;
+using MusicShop.Data.Dapper;
 using MusicShop.Domain.Entities;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -12,10 +13,10 @@ namespace MusicShop.API.Controllers
     public class AlbumController : ControllerBase
     {
 
-        AlbumRepository albumRepository;
+        IAlbumRepository albumRepository;
         public AlbumController()
         {
-            albumRepository = new AlbumRepository();
+            albumRepository = new AlbumDapperRepository();
         }
 
         [HttpGet("All")]
