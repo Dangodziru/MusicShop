@@ -209,5 +209,10 @@ namespace MusicShop.Data
                 }
             }
         }
+
+        public bool AlbumIsExist(string title, long artistId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

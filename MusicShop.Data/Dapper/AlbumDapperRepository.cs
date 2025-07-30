@@ -1,30 +1,28 @@
 ﻿using MusicShop.Domain.Entities;
 using System.Data.SQLite;
 using Dapper;
+using System.Linq;
 
 namespace MusicShop.Data.Dapper
 {
     public class AlbumDapperRepository : IAlbumRepository
     {
-        const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-        const string connectionString = $"Data Source={dbPath};Version=3;";
+        protected const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
+        protected const string connectionString = $"Data Source={dbPath};Version=3;";
 
         public List<Album> GetAll()
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                using (var cmd = new SQLiteCommand(connection))
-                {
-                    return connection.Query<Album, Artist, Album>(
-                        "SELECT al.*, a.* FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId ",
-                        (album, artist) => {
-                            album.Artist = artist;
-                            return album;
-                        },splitOn: "ArtistId"
-                        ).ToList();
-                    
-                }
-
+                return connection.Query<Album, Artist, Album>(
+                    "SELECT al.*, a.* FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId ",
+                    (album, artist) =>
+                    {
+                        album.Artist = artist;
+                        return album;
+                    },
+                    splitOn: "ArtistId"
+                ).ToList();
             }
         }
 
@@ -45,44 +43,32 @@ namespace MusicShop.Data.Dapper
                         return album;
                     },
                     param: new { albumId },
-                    splitOn: "ArtistId" 
+                    splitOn: "ArtistId"
                 ).FirstOrDefault();
             }
         }
 
         public List<Album> Search(string titleSearch)
         {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                return connection.Query<Album>(
+                    "SELECT * FROM Album WHERE Title LIKE @titleSearch",
+                    new { titleSearch = $"%{titleSearch}%" }
+                ).ToList();
+            }
+        }
 
-            var list = new List<Album>();
-
-            // Создание подключения
+        public virtual long? InsertAlbum(string title, long artistId)
+        {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-
-                string sql = "SELECT * FROM Album WHERE Title LIKE @titleSearch";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@titleSearch", "%"+titleSearch+"%");
-
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
-                    {
-
-                        while (reader.Read())
-                        {
-
-                            list.Add(new Album { Id = (long)reader["AlbumId"],
-                                Title = (string)reader["Title"],
-                                ArtistId = (long)reader["ArtistId"] });
-
-                        }
-                    }
-                }
-
+                return connection.ExecuteScalar<long?>(
+                    "INSERT INTO Album(title, ArtistId) VALUES(@title, @artistId); SELECT last_insert_rowid();",
+                    new { title, artistId }
+                );
             }
-
-            return list;
         }
 
         public bool DeleteAlbum(long albumId)
@@ -90,47 +76,12 @@ namespace MusicShop.Data.Dapper
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "DELETE FROM Album WHERE AlbumId = @albumId";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@albumId", albumId);
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                int rowsAffected = connection.Execute(
+                    "DELETE FROM Album WHERE AlbumId = @albumId",
+                    new { albumId }
+                );
+                return rowsAffected > 0;
             }
-        }
-
-        public long? InsertAlbum(string title, long artistId)
-        {
-            long? newId;
-
-            using (var connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                string sql = "INSERT INTO Album(title, ArtistId) VALUES(@title,@artistId); SELECT last_insert_rowid();";
-
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@title", title);
-                    cmd.Parameters.AddWithValue("@artistId", artistId);
-
-                    newId = (long)cmd.ExecuteScalar();
-                }
-            }
-            return newId;
-
         }
 
         public bool UpdateAlbum(long albumId, string title, long artistId)
@@ -138,28 +89,28 @@ namespace MusicShop.Data.Dapper
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = @"
-            UPDATE Album 
-            SET Title = @title, ArtistId = @artistId 
-            WHERE AlbumId = @albumId";
+                int rowsAffected = connection.Execute(
+                    @"UPDATE Album 
+                      SET Title = @title, ArtistId = @artistId 
+                      WHERE AlbumId = @albumId",
+                    new { albumId, title, artistId }
+                );
+                return rowsAffected > 0;
+            }
+        }
 
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@title", title);
-                    cmd.Parameters.AddWithValue("@artistId", artistId);
-                    cmd.Parameters.AddWithValue("@albumId", albumId);
+        public bool AlbumIsExist(string title, long artistId) 
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
 
-                    int rowsAffected = cmd.ExecuteNonQuery();
+                var existing = connection.QueryFirstOrDefault<Artist>(
+                    "SELECT * FROM Album WHERE LOWER(Title) = LOWER(@title) AND ArtistId = @artistId ",
+                    new { title, artistId });
 
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                return existing != null;
+
             }
         }
     }

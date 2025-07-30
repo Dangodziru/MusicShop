@@ -7,8 +7,8 @@ namespace MusicShop.Data.Dapper
 {
     public class ArtistDapperRepository : IArtistRepository
     {
-        const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-        const string connectionString = $"Data Source={dbPath};Version=3;";
+        protected const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
+        protected const string connectionString = $"Data Source={dbPath};Version=3;";
 
         public List<Artist> GetAll()
         {
@@ -18,8 +18,8 @@ namespace MusicShop.Data.Dapper
                     "SELECT * FROM Artist"
                     ).ToList();
             }
-            
         }
+
         public Artist? Get(long artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
@@ -37,12 +37,12 @@ namespace MusicShop.Data.Dapper
             {
                 return connection.Query<Artist>(
                     "SELECT * FROM Artist WHERE Name LIKE @nameSearch",
-                    new {nameSearch = $"%{nameSearch}%" }
+                    new { nameSearch = $"%{nameSearch}%" }
                     ).ToList();
             }
         }
 
-        public long? InsertArtist(string name)
+        public virtual long? InsertArtist(string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
