@@ -10,5 +10,6 @@ namespace MusicShop.Data
         long? InsertArtist(string name);
         List<Artist> Search(string nameSearch);
         bool UpdateArtist(long artistId, string name);
+        bool ArtistIsExist(string title);
     }
 }

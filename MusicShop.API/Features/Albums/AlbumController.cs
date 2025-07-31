@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MusicShop.API.Features.Albums.Requests;
 using MusicShop.Data;
 using MusicShop.Data.Dapper;
-using MusicShop.Data.Validating;
 using MusicShop.Domain.Entities;
 using System;
 
@@ -62,16 +61,16 @@ namespace MusicShop.API.Features.Albums
         public IActionResult DeleteAlbum(AlbumDeleteRequest request)
         {
             return albumRepository.DeleteAlbum(request.AlbumId)
-                ? Ok($"Album {request.AlbumId} deleted")
-                : NotFound($"Album {request.AlbumId} not found");
+                ? Ok($"Альбом {request.AlbumId} удален")
+                : NotFound($"Альбом {request.AlbumId} не найден");
         }
 
         [HttpPost("UpdateAlbum")]
         public IActionResult UpdateAlbum(AlbumUpdateRequest request)
         {
             return albumRepository.UpdateAlbum(request.AlbumId, request.Title, request.ArtistId)
-                ? Ok($"Album {request.AlbumId} updated")
-                : NotFound($"Album {request.AlbumId} not found");
+                ? Ok($"Альбом {request.AlbumId} обновлен")
+                : NotFound($"Альбом {request.AlbumId} не найден");
         }
     }
 }

@@ -4,7 +4,6 @@ using MusicShop.API.Features.Albums.Requests;
 using MusicShop.API.Features.Artist.Request;
 using MusicShop.Data;
 using MusicShop.Data.Dapper;
-using MusicShop.Data.Validating;
 using MusicShop.Domain.Entities;
 using System;
 
@@ -29,7 +28,7 @@ public class ArtistController : ControllerBase
     public IActionResult Get([FromQuery] ArtistGetRequest request)
     {
         var artist = artistRepository.Get(request.ArtistId);
-        return artist == null ? NotFound($"Artist {request.ArtistId} not found") : Ok(artist);
+        return artist == null ? NotFound($"Исполнитель {request.ArtistId} не найден") : Ok(artist);
     }
 
     [HttpGet("Search")]
@@ -39,18 +38,21 @@ public class ArtistController : ControllerBase
     }
 
     [HttpPost("InsertArtist")]
-    public IActionResult InsertArtist(ArtistInsertReqestcs reqest)
+    public IActionResult InsertArtist(ArtistInsertReqestcs request)
     {
-        try
+        bool artistExist = artistRepository.ArtistIsExist(request.Name);
+        if (artistExist)
         {
-            var artistId = artistRepository.InsertArtist(reqest.Name);
-            return artistId.HasValue
-                ? Ok(new { ArtistId = artistId })
-                : BadRequest("Failed to create artist");
+            return BadRequest("Такой исполнитель уже существует");
         }
-        catch (InvalidOperationException ex)
+        var artistId = artistRepository.InsertArtist(request.Name);
+        if (artistId.HasValue)
         {
-            return Conflict(ex.Message);
+            return Ok(new { ArtistId = artistId });
+        }
+        else
+        {
+            return BadRequest("Не удалось создать исполнителя");
         }
     }
 
@@ -58,15 +60,15 @@ public class ArtistController : ControllerBase
     public IActionResult DeleteArtist(ArtistDeleteRequest request)
     {
         return artistRepository.DeleteArtist(request.ArtistId)
-            ? Ok($"Artist {request.ArtistId} deleted")
-            : NotFound($"Artist {request.ArtistId} not found");
+            ? Ok($"Исполнитель {request.ArtistId} удален")
+            : NotFound($"Исполнитель {request.ArtistId} не найден");
     }
 
     [HttpPost("UpdateArtist")]
     public IActionResult UpdateArtist(ArtistUpdateRequest request)
     {
         return artistRepository.UpdateArtist(request.ArtistId, request.Name)
-            ? Ok($"Artist {request.ArtistId} updated")
-            : NotFound($"Artist {request.ArtistId} not found");
+            ? Ok($"Исполнитель {request.ArtistId} обновлен")
+            : NotFound($"Исполнитель {request.ArtistId} не найден");
     }
 }

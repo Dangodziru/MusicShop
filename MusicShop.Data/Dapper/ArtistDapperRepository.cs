@@ -76,5 +76,21 @@ namespace MusicShop.Data.Dapper
                 return affectedRows > 0;
             }
         }
+
+        public bool ArtistIsExist(string name)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                var existing = connection.QueryFirstOrDefault<Artist>(
+                    "SELECT * FROM Artist WHERE LOWER(Name) = LOWER(@name)",
+                    new { name });
+
+                return existing != null;
+
+            }
+        }
+
     }
 }
