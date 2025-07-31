@@ -31,7 +31,7 @@ public class CustomerController : ControllerBase
     {
             var customer = customerRepository.Get(request.CustomerId);
             return customer == null
-                ? NotFound($"Покупатель {request.CustomerId} не найден")
+                ? NotFound($"Пакупатель {request.CustomerId} не найден")
                 : Ok(customer);
 
     }
@@ -48,7 +48,7 @@ public class CustomerController : ControllerBase
         bool customerIsExist = customerRepository.CustomerIsExist(request.Email);
         if (customerIsExist)
         {
-            return BadRequest("Покупатель с таким email или номером телефона уже существует ");
+            return BadRequest("Пакупатель с таким email или номером телефона уже существует ");
         }
         var customerId = customerRepository.InsertCustomer(request.FirstName,request.LastName,
             request.Company,request.Address,request.City,request.State,
@@ -59,7 +59,7 @@ public class CustomerController : ControllerBase
         }
         else
         {
-            return BadRequest("Не удалось создать покупателя");
+            return BadRequest("Не удалось создать пакупателя");
         }
     }
 
@@ -67,8 +67,8 @@ public class CustomerController : ControllerBase
     public IActionResult DeleteCustomer(CustomerDeleteRequest request)
     {
         return customerRepository.DeleteCustomer(request.CustomerId)
-            ? Ok($"Покупатель {request.CustomerId} удален")
-            : NotFound($"Покупатель {request.CustomerId} не найден");
+            ? Ok($"Пакупатель {request.CustomerId} удален")
+            : NotFound($"Пакупатель {request.CustomerId} не найден");
     }
 
     [HttpPost("UpdateCustomer")]
@@ -77,7 +77,7 @@ public class CustomerController : ControllerBase
         return customerRepository.UpdateCustomer(request.CustomerId, request.FirstName, request.LastName,
             request.Company, request.Address, request.City, request.State,
            request.Conutry, request.PostalCode, request.Phone, request.Fax, request.Email, request.SupportRepId)
-      ? Ok($"Покупатель {request.CustomerId} обновлен")
-      : NotFound($"Покупатель {request.CustomerId} не найден");
+      ? Ok($"Пакупатель {request.CustomerId} обновлен")
+      : NotFound($"Пакупатель {request.CustomerId} не найден");
     }
 }
