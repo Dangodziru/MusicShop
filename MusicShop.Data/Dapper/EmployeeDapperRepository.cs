@@ -1,40 +1,42 @@
-﻿using Dapper;
-using MusicShop.Domain;
-using MusicShop.Domain.Entities;
+﻿using MusicShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicShop.Domain;
 
 namespace MusicShop.Data.Dapper
 {
-    public class CustomerDapperRepositoty : ICustomerRepositoty
+    public class EmployeeDapperRepository : IEmployeeRepository
     {
         const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
         const string connectionString = $"Data Source={dbPath};Version=3;";
 
-        public List<Customer> GetAll()
+        public List<Employee> GetAll()
         {
-            var customers = new List<Customer>();
+            var employees = new List<Employee>();
 
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Customer";
+                const string sql = "SELECT * FROM Employee";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        customers.Add(new Customer
+                        employees.Add(new Employee
                         {
-                            CustomerId = (long)reader["CustomerId"],
-                            FirstName = reader["FirstName"] as string,
+                            EmployeeId = (long)reader["EmployeeId"],
                             LastName = reader["LastName"] as string,
-                            Company = reader["Company"] as string,
+                            FirstName = reader["FirstName"] as string,
+                            Title = reader["Title"] as string,
+                            ReportsTo = reader["ReportsTo"] as long?,
+                            BirthDate = reader["BirthDate"] as DateTime?,
+                            HireDate = reader["HireDate"] as DateTime?,
                             Address = reader["Address"] as string,
                             City = reader["City"] as string,
                             State = reader["State"] as string,
@@ -42,36 +44,38 @@ namespace MusicShop.Data.Dapper
                             PostalCode = reader["PostalCode"] as string,
                             Phone = reader["Phone"] as string,
                             Fax = reader["Fax"] as string,
-                            Email = reader["Email"] as string,
-                            SupportRepId = reader["SupportRepId"] as long?
+                            Email = reader["Email"] as string
                         });
                     }
                 }
             }
-            return customers;
+            return employees;
         }
 
-        public Customer? Get(long customerId)
+        public Employee? Get(long employeeId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Customer WHERE CustomerId = @customerId";
+                const string sql = "SELECT * FROM Employee WHERE EmployeeId = @employeeId";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    cmd.Parameters.AddWithValue("@employeeId", employeeId);
 
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            return new Customer
+                            return new Employee
                             {
-                                CustomerId = (long)reader["CustomerId"],
-                                FirstName = reader["FirstName"] as string,
+                                EmployeeId = (long)reader["EmployeeId"],
                                 LastName = reader["LastName"] as string,
-                                Company = reader["Company"] as string,
+                                FirstName = reader["FirstName"] as string,
+                                Title = reader["Title"] as string,
+                                ReportsTo = reader["ReportsTo"] as long?,
+                                BirthDate = reader["BirthDate"] as DateTime?,
+                                HireDate = reader["HireDate"] as DateTime?,
                                 Address = reader["Address"] as string,
                                 City = reader["City"] as string,
                                 State = reader["State"] as string,
@@ -79,8 +83,7 @@ namespace MusicShop.Data.Dapper
                                 PostalCode = reader["PostalCode"] as string,
                                 Phone = reader["Phone"] as string,
                                 Fax = reader["Fax"] as string,
-                                Email = reader["Email"] as string,
-                                SupportRepId = reader["SupportRepId"] as long?
+                                Email = reader["Email"] as string
                             };
                         }
                     }
@@ -89,18 +92,19 @@ namespace MusicShop.Data.Dapper
             return null;
         }
 
-        public List<Customer> Search(string searchTerm)
+        public List<Employee> Search(string searchTerm)
         {
-            var customers = new List<Customer>();
+            var employees = new List<Employee>();
 
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = @"
-                SELECT * FROM Customer 
-                WHERE FirstName LIKE '%' || @searchTerm || '%' 
-                   OR LastName LIKE '%' || @searchTerm || '%' 
-                   OR Email LIKE '%' || @searchTerm || '%'";
+                const string sql = @"
+                SELECT * FROM Employee 
+                WHERE 
+                    FirstName LIKE '%' || @searchTerm || '%' OR
+                    LastName LIKE '%' || @searchTerm || '%' OR
+                    Email LIKE '%' || @searchTerm || '%'";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 {
@@ -110,12 +114,15 @@ namespace MusicShop.Data.Dapper
                     {
                         while (reader.Read())
                         {
-                            customers.Add(new Customer
+                            employees.Add(new Employee
                             {
-                                CustomerId = (long)reader["CustomerId"],
-                                FirstName = reader["FirstName"] as string,
+                                EmployeeId = (long)reader["EmployeeId"],
                                 LastName = reader["LastName"] as string,
-                                Company = reader["Company"] as string,
+                                FirstName = reader["FirstName"] as string,
+                                Title = reader["Title"] as string,
+                                ReportsTo = reader["ReportsTo"] as long?,
+                                BirthDate = reader["BirthDate"] as DateTime?,
+                                HireDate = reader["HireDate"] as DateTime?,
                                 Address = reader["Address"] as string,
                                 City = reader["City"] as string,
                                 State = reader["State"] as string,
@@ -123,40 +130,45 @@ namespace MusicShop.Data.Dapper
                                 PostalCode = reader["PostalCode"] as string,
                                 Phone = reader["Phone"] as string,
                                 Fax = reader["Fax"] as string,
-                                Email = reader["Email"] as string,
-                                SupportRepId = reader["SupportRepId"] as long?
+                                Email = reader["Email"] as string
                             });
                         }
                     }
                 }
             }
-            return customers;
+            return employees;
         }
 
-        public long? InsertCustomer(
-            string firstName, string lastName, string company,
-            string address, string city, string state, string country,
-            string postalCode, string phone, string fax, string email, long? supportRepId)
+        public long? InsertEmployee(
+            string lastName, string firstName, string title, long? reportsTo,
+            DateTime? birthDate, DateTime? hireDate, string address, string city,
+            string state, string country, string postalCode, string phone,
+            string fax, string email)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = @"
-                INSERT INTO Customer (
-                    FirstName, LastName, Company, Address, City, 
-                    State, Country, PostalCode, Phone, Fax, Email, SupportRepId
+                const string sql = @"
+                INSERT INTO Employee (
+                    LastName, FirstName, Title, ReportsTo, BirthDate,
+                    HireDate, Address, City, State, Country,
+                    PostalCode, Phone, Fax, Email
                 ) 
                 VALUES (
-                    @FirstName, @LastName, @Company, @Address, @City,
-                    @State, @Country, @PostalCode, @Phone, @Fax, @Email, @SupportRepId
+                    @LastName, @FirstName, @Title, @ReportsTo, @BirthDate,
+                    @HireDate, @Address, @City, @State, @Country,
+                    @PostalCode, @Phone, @Fax, @Email
                 );
                 SELECT last_insert_rowid();";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 {
-                    cmd.Parameters.AddWithValue("@FirstName", firstName);
-                    cmd.Parameters.AddWithValue("@LastName", lastName);
-                    cmd.Parameters.AddWithValue("@Company", company ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@LastName", lastName ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FirstName", firstName ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Title", title ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReportsTo", reportsTo ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@BirthDate", birthDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@HireDate", hireDate ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Address", address ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@City", city ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@State", state ?? (object)DBNull.Value);
@@ -165,51 +177,46 @@ namespace MusicShop.Data.Dapper
                     cmd.Parameters.AddWithValue("@Phone", phone ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Fax", fax ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Email", email ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@SupportRepId", supportRepId ?? (object)DBNull.Value);
 
                     return (long?)cmd.ExecuteScalar();
                 }
             }
         }
 
-        public bool DeleteCustomer(long customerId)
+        public bool DeleteEmployee(long employeeId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = "DELETE FROM Customer WHERE CustomerId = @customerId";
+                const string sql = "DELETE FROM Employee WHERE EmployeeId = @employeeId";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    cmd.Parameters.AddWithValue("@employeeId", employeeId);
                     int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return rowsAffected > 0;
                 }
             }
         }
 
-        public bool UpdateCustomer(
-            long customerId, string firstName, string lastName, string company,
-            string address, string city, string state, string country,
-            string postalCode, string phone, string fax, string email, long? supportRepId)
+        public bool UpdateEmployee(
+            long employeeId, string lastName, string firstName, string title, long? reportsTo,
+            DateTime? birthDate, DateTime? hireDate, string address, string city,
+            string state, string country, string postalCode, string phone,
+            string fax, string email)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                string sql = @"
-                UPDATE Customer 
+                const string sql = @"
+                UPDATE Employee 
                 SET 
-                    FirstName = @FirstName,
                     LastName = @LastName,
-                    Company = @Company,
+                    FirstName = @FirstName,
+                    Title = @Title,
+                    ReportsTo = @ReportsTo,
+                    BirthDate = @BirthDate,
+                    HireDate = @HireDate,
                     Address = @Address,
                     City = @City,
                     State = @State,
@@ -217,16 +224,18 @@ namespace MusicShop.Data.Dapper
                     PostalCode = @PostalCode,
                     Phone = @Phone,
                     Fax = @Fax,
-                    Email = @Email,
-                    SupportRepId = @SupportRepId
-                WHERE CustomerId = @CustomerId";
+                    Email = @Email
+                WHERE EmployeeId = @EmployeeId";
 
                 using (var cmd = new SQLiteCommand(sql, connection))
                 {
-                    cmd.Parameters.AddWithValue("@CustomerId", customerId);
-                    cmd.Parameters.AddWithValue("@FirstName", firstName);
-                    cmd.Parameters.AddWithValue("@LastName", lastName);
-                    cmd.Parameters.AddWithValue("@Company", company ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@EmployeeId", employeeId);
+                    cmd.Parameters.AddWithValue("@LastName", lastName ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FirstName", firstName ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Title", title ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReportsTo", reportsTo ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@BirthDate", birthDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@HireDate", hireDate ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Address", address ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@City", city ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@State", state ?? (object)DBNull.Value);
@@ -235,32 +244,11 @@ namespace MusicShop.Data.Dapper
                     cmd.Parameters.AddWithValue("@Phone", phone ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Fax", fax ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Email", email ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@SupportRepId", supportRepId ?? (object)DBNull.Value);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return rowsAffected > 0;
                 }
             }
         }
-        public bool CustomerIsExist(string email)
-        {
-            using (var connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                var existing = connection.QueryFirstOrDefault<Artist>(
-                    "SELECT * FROM Customer WHERE Email = @email;",
-                    new {email});
-
-                return existing != null;
-        }    }    
     }
 }

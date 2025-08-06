@@ -40,6 +40,7 @@ namespace MusicShop.Data.Dapper
                     map: (album, artist) =>
                     {
                         album.Artist = artist;
+                        album.Id = albumId;
                         return album;
                     },
                     param: new { albumId },
