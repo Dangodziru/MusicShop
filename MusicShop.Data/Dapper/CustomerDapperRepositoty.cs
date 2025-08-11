@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using MusicShop.Domain;
 using MusicShop.Domain.Entities;
 using System;
@@ -12,8 +13,12 @@ namespace MusicShop.Data.Dapper
 {
     public class CustomerDapperRepositoty : ICustomerRepositoty
     {
-        const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-        const string connectionString = $"Data Source={dbPath};Version=3;";
+        protected readonly string connectionString;
+
+        public CustomerDapperRepositoty(IConfiguration config)
+        {
+            connectionString = config.GetConnectionString("MusicShop")!;
+        }
 
         public List<Customer> GetAll()
         {

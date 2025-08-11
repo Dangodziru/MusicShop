@@ -2,19 +2,25 @@
 using System.Data.SQLite;
 using Dapper;
 using System.Linq;
+using System.Configuration.Internal;
+using Microsoft.Extensions.Configuration;
 
 namespace MusicShop.Data.Dapper
 {
     public class AlbumDapperRepository : IAlbumRepository
     {
-        protected const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-        protected const string connectionString = $"Data Source={dbPath};Version=3;";
+        protected readonly string connectionString;
 
-        public List<Album> GetAll()
+        public AlbumDapperRepository(IConfiguration config)
+        {
+            connectionString = config.GetConnectionString("MusicShop")!;
+        }
+
+        public Task<IEnumerable<Album>> GetAll()
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return connection.Query<Album, Artist, Album>(
+                return connection.QueryAsync<Album, Artist, Album>(
                     "SELECT al.*, a.* FROM Album al JOIN Artist a ON a.ArtistId = al.ArtistId ",
                     (album, artist) =>
                     {
@@ -22,11 +28,11 @@ namespace MusicShop.Data.Dapper
                         return album;
                     },
                     splitOn: "ArtistId"
-                ).ToList();
+                );
             }
         }
 
-        public Album? Get(long albumId)
+        public async Task<Album?> Get(long albumId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -35,7 +41,7 @@ namespace MusicShop.Data.Dapper
                     JOIN Artist a ON a.ArtistId = al.ArtistId 
                     WHERE al.AlbumId = @albumId";
 
-                return connection.Query<Album, Artist, Album>(
+                var result = await connection.QueryAsync<Album, Artist, Album>(
                     sql,
                     map: (album, artist) =>
                     {
@@ -45,26 +51,27 @@ namespace MusicShop.Data.Dapper
                     },
                     param: new { albumId },
                     splitOn: "ArtistId"
-                ).FirstOrDefault();
+                );
+               return result.FirstOrDefault();
             }
         }
 
-        public List<Album> Search(string titleSearch)
+        public async Task<IEnumerable<Album>> Search(string titleSearch)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return connection.Query<Album>(
+                return await connection.QueryAsync<Album>(
                     "SELECT * FROM Album WHERE Title LIKE @titleSearch",
                     new { titleSearch = $"%{titleSearch}%" }
-                ).ToList();
+                );
             }
         }
 
-        public virtual long? InsertAlbum(string title, long artistId)
+        public virtual async Task<long?> InsertAlbum(string title, long artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return connection.ExecuteScalar<long?>(
                     "INSERT INTO Album(title, ArtistId) VALUES(@title, @artistId); SELECT last_insert_rowid();",
                     new { title, artistId }
@@ -72,12 +79,12 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public bool DeleteAlbum(long albumId)
+        public async Task<bool> DeleteAlbum(long albumId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-                int rowsAffected = connection.Execute(
+                await connection.OpenAsync();
+                int rowsAffected = await connection.ExecuteAsync(
                     "DELETE FROM Album WHERE AlbumId = @albumId",
                     new { albumId }
                 );
@@ -85,33 +92,30 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public bool UpdateAlbum(long albumId, string title, long artistId)
+        public async Task<bool> UpdateAlbum(long albumId, string title, long artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-                int rowsAffected = connection.Execute(
-                    @"UPDATE Album 
-                      SET Title = @title, ArtistId = @artistId 
-                      WHERE AlbumId = @albumId",
+                await connection.OpenAsync();
+                int rowsAffected = await connection.ExecuteAsync(
+                    @"UPDATE Album SET Title = @title, ArtistId = @artistId 
+              WHERE AlbumId = @albumId",
                     new { albumId, title, artistId }
                 );
                 return rowsAffected > 0;
             }
         }
 
-        public bool AlbumIsExist(string title, long artistId) 
+        public async Task<bool> AlbumIsExist(string title, long artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-
-                var existing = connection.QueryFirstOrDefault<Artist>(
-                    "SELECT * FROM Album WHERE LOWER(Title) = LOWER(@title) AND ArtistId = @artistId ",
-                    new { title, artistId });
-
+                await connection.OpenAsync();
+                var existing = await connection.QueryFirstOrDefaultAsync<Album>(
+                    "SELECT * FROM Album WHERE LOWER(Title) = LOWER(@title) AND ArtistId = @artistId",
+                    new { title, artistId }
+                );
                 return existing != null;
-
             }
         }
     }

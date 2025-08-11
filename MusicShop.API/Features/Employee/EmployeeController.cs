@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MusicShop.API.Features.Employee.Request;
 using MusicShop.Data.Dapper;
+using MusicShop.Domain;
 using MusicShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using MusicShop.API.Features.Employee.Request;
 
 [ApiController]
 [Route("api/[controller]")]
 public class EmployeeController : ControllerBase
 {
-    private readonly EmployeeDapperRepository employeeRepository;
+    private readonly IEmployeeRepository employeeRepository;
 
-    public EmployeeController()
+    public EmployeeController(IEmployeeRepository employeeRepository)
     {
-        employeeRepository = new EmployeeDapperRepository();
+        this.employeeRepository = employeeRepository;
     }
 
     [HttpGet("All")]

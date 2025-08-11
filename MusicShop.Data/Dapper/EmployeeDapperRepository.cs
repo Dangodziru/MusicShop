@@ -1,18 +1,23 @@
-﻿using MusicShop.Domain.Entities;
+﻿using Microsoft.Extensions.Configuration;
+using MusicShop.Domain;
+using MusicShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MusicShop.Domain;
 
 namespace MusicShop.Data.Dapper
 {
     public class EmployeeDapperRepository : IEmployeeRepository
     {
-        const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-        const string connectionString = $"Data Source={dbPath};Version=3;";
+        protected readonly string connectionString;
+
+        public EmployeeDapperRepository(IConfiguration config)
+        {
+            connectionString = config.GetConnectionString("MusicShop")!;
+        }
 
         public List<Employee> GetAll()
         {

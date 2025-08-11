@@ -1,63 +1,69 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
+using MusicShop.Domain;
 using MusicShop.Domain.Entities;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using MusicShop.Domain;
+using System.Threading.Tasks;
 
 namespace MusicShop.Data.Dapper
 {
     public class GenreDapperRepository : IGenreRepository
     {
-        protected const string dbPath = "C:\\Users\\Goida\\AppData\\Roaming\\DBeaverData\\workspace6\\.metadata\\sample-database-sqlite-1\\Chinook.db";
-        protected const string connectionString = $"Data Source={dbPath};Version=3;";
+        protected readonly string connectionString;
 
-        public List<Genre> GetAll()
+        public GenreDapperRepository(IConfiguration config)
+        {
+            connectionString = config.GetConnectionString("MusicShop")!;
+        }
+
+        public async Task<IEnumerable<Genre>> GetAll()
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return connection.Query<Genre>("SELECT * FROM Genre").ToList();
+                return await connection.QueryAsync<Genre>("SELECT * FROM Genre");
             }
         }
 
-        public Genre? Get(long genreId)
+        public async Task<Genre?> Get(long genreId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return connection.QueryFirstOrDefault<Genre>(
+                return await connection.QueryFirstOrDefaultAsync<Genre>(
                     "SELECT * FROM Genre WHERE GenreId = @genreId",
                     new { genreId }
                 );
             }
         }
 
-        public List<Genre> Search(string term)
+        public async Task<IEnumerable<Genre>> Search(string term)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return connection.Query<Genre>(
+                return await connection.QueryAsync<Genre>(
                     "SELECT * FROM Genre WHERE Name LIKE @searchTerm",
                     new { searchTerm = $"%{term}%" }
-                ).ToList();
+                );
             }
         }
 
-        public long? Insert(Genre genre)
+        public async Task<long?> Insert(Genre genre)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return connection.ExecuteScalar<long?>(
+                return await connection.ExecuteScalarAsync<long?>(
                     "INSERT INTO Genre (Name) VALUES (@Name); SELECT last_insert_rowid();",
                     new { genre.Name }
                 );
             }
         }
 
-        public bool Update(Genre genre)
+        public async Task<bool> Update(Genre genre)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                int affectedRows = connection.Execute(
+                int affectedRows = await connection.ExecuteAsync(
                     "UPDATE Genre SET Name = @Name WHERE GenreId = @GenreId",
                     new { genre.GenreId, genre.Name }
                 );
@@ -65,11 +71,11 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public bool Delete(long genreId)
+        public async Task<bool> Delete(long genreId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                int affectedRows = connection.Execute(
+                int affectedRows = await connection.ExecuteAsync(
                     "DELETE FROM Genre WHERE GenreId = @genreId",
                     new { genreId }
                 );

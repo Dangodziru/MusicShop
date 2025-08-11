@@ -1,101 +1,105 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using MusicShop.Domain.Entities;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MusicShop.Data.Dapper
 {
-    public class ArtistDapperRepository : artistRepository
+    internal class PlaylistDapperRepository : IPlaylistRepository
     {
         protected readonly string connectionString;
 
-        public ArtistDapperRepository(IConfiguration config)
+        public PlaylistDapperRepository(IConfiguration config)
         {
             connectionString = config.GetConnectionString("MusicShop")!;
         }
 
-        public async Task<IEnumerable<Artist>> GetAll()
+        public async Task<IEnumerable<Playlist>> GetAll()
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return await connection.QueryAsync<Artist>(
-                    "SELECT * FROM Artist"
+                return await connection.QueryAsync<Playlist>(
+                    "SELECT * FROM Playlist"
                     );
             }
         }
 
-        public async Task<Artist?> Get(long artistId)
+        public async Task<Playlist?> Get(long playlistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return await connection.QueryFirstOrDefaultAsync<Artist>(
-                    "SELECT * FROM Artist WHERE ArtistId = @artistId",
-                    new { artistId }
+                return await connection.QueryFirstOrDefaultAsync<Playlist>(
+                    "SELECT * FROM Playlist WHERE PlaylistId = @playlistId",
+                    new { playlistId }
                 );
             }
         }
 
-        public async Task<IEnumerable<Artist>> Search(string nameSearch)
+        public async Task<IEnumerable<Playlist>> Search(string nameSearch)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return await connection.QueryAsync<Artist>(
-                    "SELECT * FROM Artist WHERE Name LIKE @nameSearch",
+                return await connection.QueryAsync<Playlist>(
+                    "SELECT * FROM Playlist WHERE Name LIKE @nameSearch",
                     new { nameSearch = $"%{nameSearch}%" }
                     );
             }
         }
 
-        public async virtual Task<long?> InsertArtist(string name)
+        public async virtual Task<long?> InsertPlaylist(string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 return await connection.ExecuteScalarAsync<long?>(
-                    "INSERT INTO Artist (Name) VALUES (@name); SELECT last_insert_rowid();",
+                    "INSERT INTO Playlist (Name) VALUES (@name); SELECT last_insert_rowid();",
                     new { name }
                 );
             }
         }
 
-        public async Task<bool> DeleteArtist(long artistId)
+        public async Task<bool> DeletePlaylist(long playlistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 int affectedRows = await connection.ExecuteAsync(
-                     "DELETE FROM Artist WHERE ArtistId = @artistId",
-                     new { artistId }
+                     "DELETE FROM Playlist WHERE PlaylistId = @playlistId",
+                     new { playlistId }
                  );
                 return affectedRows > 0;
             }
         }
 
-        public async Task<bool> UpdateArtist(long artistId, string name)
+        public async Task<bool> UpdatePlaylist(long playlistId, string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 int affectedRows = await connection.ExecuteAsync(
-                   "UPDATE Artist SET Name = @name WHERE ArtistId = @artistId",
-                   new { artistId, name }
+                   "UPDATE Playlist SET Name = @name WHERE playlistId = @playlistId",
+                   new { playlistId, name }
                );
                 return affectedRows > 0;
             }
         }
 
-        public async Task<bool> ArtistIsExist(string name)
+        public async Task<bool> PlaylistIsExist(string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                var existing = await connection.QueryFirstOrDefaultAsync<Artist>(
-                    "SELECT * FROM Artist WHERE LOWER(Name) = LOWER(@name)",
+                var existing = await connection.QueryFirstOrDefaultAsync<Playlist>(
+                    "SELECT * FROM Playlist WHERE LOWER(Name) = LOWER(@name)",
                     new { name });
 
                 return existing != null;
 
             }
         }
-
     }
 }

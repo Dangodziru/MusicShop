@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using MusicShop.Domain;
 using MusicShop.API.Features.Genre.Request;
+using System.Threading.Tasks;
 
 
 
@@ -16,37 +17,37 @@ public class GenreController : ControllerBase
 {
         private readonly IGenreRepository genreRepository;
 
-        public GenreController()
-        {
-            genreRepository = new GenreDapperRepository();
-        }
+    public GenreController(IGenreRepository genreRepository)
+    {
+        this.genreRepository = genreRepository;
+    }
 
 
     [HttpGet("All")]
-    public List<Genre> GetAll() => genreRepository.GetAll();
+    public async Task<IEnumerable<Genre>> GetAll() => await genreRepository.GetAll();
 
     
     [HttpGet("SearchById")]
-    public ActionResult<Genre> Get([FromQuery]GenreGetRequestcs request)
+    public async Task<ActionResult<Genre>> Get([FromQuery]GenreGetRequestcs request)
     {
-        var genre = genreRepository.Get(request.GenreId);
+        var genre = await genreRepository.Get(request.GenreId);
         return genre == null
             ? NotFound(request.GenreId)
             : Ok(genre);
     }
 
     [HttpGet("Search")]
-    public List<Genre> Search([FromQuery] GenreSearchRequestcs request)
+    public async Task<IEnumerable<Genre>> Search([FromQuery] GenreSearchRequestcs request)
     {
-        return genreRepository.Search(request.Term);
+        return await genreRepository.Search(request.Term);
     }
 
 
     [HttpPost("InsertGenre")]
-    public IActionResult InsertGenre(GenreInsertRequest request)
+    public async Task<IActionResult> InsertGenre(GenreInsertRequest request)
     {
         var genre = new Genre { Name = request.Name };
-        var newId = genreRepository.Insert(genre);
+        var newId = await genreRepository.Insert(genre);
 
         if (newId.HasValue)
         {
@@ -64,7 +65,7 @@ public class GenreController : ControllerBase
         
 
     [HttpPut("UpdateGenre")]
-    public IActionResult UpdateGenre(GenreUpdateRequest request)
+    public async Task<IActionResult> UpdateGenre(GenreUpdateRequest request)
     {
         var genre = new Genre
         {
@@ -72,7 +73,7 @@ public class GenreController : ControllerBase
             Name = request.Name
         };
 
-        var updated = genreRepository.Update(genre);
+        var updated = await genreRepository.Update(genre);
 
         return updated
             ? Ok($"Жанр {request.GenreId} успешно обновлен")
@@ -80,9 +81,9 @@ public class GenreController : ControllerBase
     }
 
     [HttpDelete("DeleteGenre")]
-    public IActionResult DeleteGenre(long genreId)
+    public async Task<IActionResult> DeleteGenre(long genreId)
     {
-        var deleted = genreRepository.Delete(genreId);
+        var deleted = await genreRepository.Delete(genreId);
 
         return deleted
             ? Ok($"Жанр {genreId} успешно удален")

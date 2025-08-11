@@ -15,9 +15,9 @@ public class CustomerController : ControllerBase
 {
     private readonly ICustomerRepositoty customerRepository;
 
-    public CustomerController()
+    public CustomerController(ICustomerRepositoty customerRepository)
     {
-        customerRepository = new CustomerDapperRepositoty();
+        this.customerRepository = customerRepository;
     }
 
     [HttpGet("All")]

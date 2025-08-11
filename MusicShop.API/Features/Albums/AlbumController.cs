@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Mediator;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.API.Features.Albums.Requests;
+using MusicShop.Bussines.Features.Albums.Get;
+using MusicShop.Bussines.Features.Albums.GetAll;
 using MusicShop.Data;
 using MusicShop.Data.Dapper;
 using MusicShop.Domain;
 using MusicShop.Domain.Entities;
 using System;
+using System.Threading.Tasks;
 
 namespace MusicShop.API.Features.Albums
 {
@@ -14,39 +18,44 @@ namespace MusicShop.API.Features.Albums
     public class AlbumController : ControllerBase
     {
         private readonly IAlbumRepository albumRepository;
+        private readonly IMediator mediator;
 
-        public AlbumController()
+        public AlbumController(IAlbumRepository albumRepository, IMediator mediator)
         {
-            albumRepository = new AlbumDapperRepository();
+            this.albumRepository = albumRepository;
+            this.mediator = mediator;
         }
 
         [HttpGet("All")]
-        public List<Album> GetAll() => albumRepository.GetAll();
+        public async ValueTask<IEnumerable<Album>> GetAll([FromQuery] GetAllRequest request, CancellationToken ct)
+        {
+            return await mediator.Send(request, ct);
+        }
 
         [HttpGet("SearchById")]
-        public IActionResult Get([FromQuery]AlbumGetRequest request)
+        public async ValueTask<IActionResult> Get([FromQuery]GetRequest request, CancellationToken ct)
         {
-            var album = albumRepository.Get(request.AlbumId);
+            var album = await mediator.Send(request, ct);
             return album == null
                 ? NotFound(request.AlbumId)
                 : Ok(album);
         }
 
         [HttpGet("Search")]
-        public List<Album> Search([FromQuery] AlbumSearchRequest request)
+        public async Task<IEnumerable<Album>> Search([FromQuery] AlbumSearchRequest request)
         {
-           return albumRepository.Search(request.TitleSearch);
+           return await albumRepository.Search(request.TitleSearch);
         }
         
         [HttpPost("InsertAlbum")]
-        public IActionResult InsertAlbum(AlbumInsertRequest request)
+        public async Task<IActionResult> InsertAlbum(AlbumInsertRequest request)
         {
-            bool albumIsExist = albumRepository.AlbumIsExist(request.Title, request.ArtistId);
+            bool albumIsExist = await albumRepository.AlbumIsExist(request.Title, request.ArtistId);
             if (albumIsExist)
             {
                 return BadRequest("Такой альбом уже существует у данного исполнителя");
             }
-            var albumId = albumRepository.InsertAlbum(request.Title, request.ArtistId);
+            var albumId =await albumRepository.InsertAlbum(request.Title, request.ArtistId);
             if (albumId.HasValue)
             {
                 return Ok(new { AlbumId = albumId });
@@ -61,17 +70,17 @@ namespace MusicShop.API.Features.Albums
 
 
         [HttpDelete("DeleteAlbum")]
-        public IActionResult DeleteAlbum(AlbumDeleteRequest request)
+        public async Task<IActionResult> DeleteAlbum(AlbumDeleteRequest request)
         {
-            return albumRepository.DeleteAlbum(request.AlbumId)
+            return await albumRepository.DeleteAlbum(request.AlbumId)
                 ? Ok(request.AlbumId)
                 : NotFound($"Альбом {request.AlbumId} не найден");
         }
 
         [HttpPost("UpdateAlbum")]
-        public IActionResult UpdateAlbum(AlbumUpdateRequest request)
+        public async Task<IActionResult> UpdateAlbum(AlbumUpdateRequest request)
         {
-            return albumRepository.UpdateAlbum(request.AlbumId, request.Title, request.ArtistId)
+            return await albumRepository.UpdateAlbum(request.AlbumId, request.Title, request.ArtistId)
                 ? Ok(request.AlbumId)
                 : NotFound($"Альбом {request.AlbumId} не найден");
         }
