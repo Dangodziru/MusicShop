@@ -1,15 +1,13 @@
 ﻿using Mediator;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MusicShop.API.Features.Albums.Requests;
+using MusicShop.Bussines.Features.Albums.Delete;
 using MusicShop.Bussines.Features.Albums.Get;
 using MusicShop.Bussines.Features.Albums.GetAll;
+using MusicShop.Bussines.Features.Albums.Insert;
+using MusicShop.Bussines.Features.Albums.Search;
+using MusicShop.Bussines.Features.Albums.Update;
 using MusicShop.Data;
-using MusicShop.Data.Dapper;
-using MusicShop.Domain;
 using MusicShop.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace MusicShop.API.Features.Albums
 {

@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MusicShop.API;
-using MusicShop.Data;
-using MusicShop.Data.Dapper;
 using MusicShop.Domain;
 using MusicShop.Domain.Entities;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using MusicShop.API.Features.Customer.Request;
-using System.Threading.Tasks;
+using MusicShop.Bussines.Features.Customers.Delete;
+using MusicShop.Bussines.Features.Customers.Get;
+using MusicShop.Bussines.Features.Customers.Insert;
+using MusicShop.Bussines.Features.Customers.Search;
+using MusicShop.Bussines.Features.Customers.Update;
 
 
 [ApiController]

@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MusicShop.API.Features.Albums.Requests;
-using MusicShop.API.Features.Artist.Request;
+﻿using Microsoft.AspNetCore.Mvc;
+using MusicShop.Bussines.Features.Artists.Delete;
+using MusicShop.Bussines.Features.Artists.Get;
+using MusicShop.Bussines.Features.Artists.Insert;
+using MusicShop.Bussines.Features.Artists.Search;
+using MusicShop.Bussines.Features.Artists.Update;
 using MusicShop.Data;
-using MusicShop.Data.Dapper;
 using MusicShop.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]

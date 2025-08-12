@@ -1,15 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using MusicShop.API.Features.Albums.Requests;
-using MusicShop.API.Features.Artist.Request;
-using MusicShop.API.Features.MediaType.Reqest;
-using MusicShop.Data;
-using MusicShop.Data.Dapper;
+﻿using Microsoft.AspNetCore.Mvc;
+using MusicShop.Bussines.Features.MediaType.Delete;
+using MusicShop.Bussines.Features.MediaType.Get;
+using MusicShop.Bussines.Features.MediaType.Insert;
+using MusicShop.Bussines.Features.MediaType.Search;
+using MusicShop.Bussines.Features.MediaType.Update;
 using MusicShop.Domain;
-using MusicShop.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 using MediaType = MusicShop.Domain.Entities.MediaType;
 
 [ApiController]

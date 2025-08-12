@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MusicShop.API.Features.Employee.Request;
+using MusicShop.Bussines.Features.Employes.Delete;
+using MusicShop.Bussines.Features.Employes.Get;
+using MusicShop.Bussines.Features.Employes.Insert;
+using MusicShop.Bussines.Features.Employes.Search;
+using MusicShop.Bussines.Features.Employes.Update;
 using MusicShop.Data.Dapper;
 using MusicShop.Domain;
 using MusicShop.Domain.Entities;
