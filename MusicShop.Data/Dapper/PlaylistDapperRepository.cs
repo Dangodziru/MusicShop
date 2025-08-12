@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MusicShop.Data.Dapper
 {
-    internal class PlaylistDapperRepository : IPlaylistRepository
+    public class PlaylistDapperRepository : IPlaylistRepository
     {
         protected readonly string connectionString;
 

@@ -20,9 +20,9 @@ public class ArtistController : ControllerBase
     }
 
     [HttpGet("All")]
-    public Task<IEnumerable<Artist>> GetAll()
+    public async Task<IEnumerable<Artist>> GetAll()
     {
-        return artistRepository.GetAll();
+        return await artistRepository.GetAll();
     }
 
     [HttpGet("SearchById")]

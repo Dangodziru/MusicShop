@@ -7,6 +7,7 @@ using MusicShop.Domain.Entities;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using MusicShop.API.Features.Customer.Request;
+using System.Threading.Tasks;
 
 
 [ApiController]
@@ -21,15 +22,15 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("All")]
-    public List<Customer> GetAll()
+    public async Task<IEnumerable<Customer>> GetAll()
     {
-    return customerRepository.GetAll();
+    return await customerRepository.GetAll();
     }
 
     [HttpGet("SearchById")]
-    public IActionResult Get([FromQuery] CustomerGetRequest request)
+    public async Task<IActionResult> Get([FromQuery] CustomerGetRequest request)
     {
-            var customer = customerRepository.Get(request.CustomerId);
+            var customer = await customerRepository.Get(request.CustomerId);
             return customer == null
                 ? NotFound($"Пакупатель {request.CustomerId} не найден")
                 : Ok(customer);
@@ -37,20 +38,20 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("Search")]
-    public List<Customer> Search([FromQuery]CustomerSearchRequestcs request)
+    public async Task<IEnumerable<Customer>> Search([FromQuery]CustomerSearchRequestcs request)
     {
-        return customerRepository.Search(request.SearchTerm);
+        return await customerRepository.Search(request.SearchTerm);
     }
 
     [HttpPost("InsertCustomer")]
-    public IActionResult InsertCustomer(CustomerInsetRequest request)
+    public async Task<IActionResult> InsertCustomer(CustomerInsetRequest request)
     {
-        bool customerIsExist = customerRepository.CustomerIsExist(request.Email);
+        bool customerIsExist = await customerRepository.CustomerIsExist(request.Email);
         if (customerIsExist)
         {
             return BadRequest("Пакупатель с таким email или номером телефона уже существует ");
         }
-        var customerId = customerRepository.InsertCustomer(request.FirstName,request.LastName,
+        var customerId = await customerRepository.InsertCustomer(request.FirstName,request.LastName,
             request.Company,request.Address,request.City,request.State,
            request.Conutry,request.PostalCode,request.Phone,request.Fax, request.Email,  request.SupportRepId);
         if (customerId.HasValue)
@@ -64,17 +65,17 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("DeleteCustomer")]
-    public IActionResult DeleteCustomer(CustomerDeleteRequest request)
+    public async Task<IActionResult> DeleteCustomer(CustomerDeleteRequest request)
     {
-        return customerRepository.DeleteCustomer(request.CustomerId)
+        return await customerRepository.DeleteCustomer(request.CustomerId)
             ? Ok($"Пакупатель {request.CustomerId} удален")
             : NotFound($"Пакупатель {request.CustomerId} не найден");
     }
 
     [HttpPost("UpdateCustomer")]
-    public IActionResult UpdateCustomer(CustomerUpdateRequest request)
+    public async Task<IActionResult> UpdateCustomer(CustomerUpdateRequest request)
     {
-        return customerRepository.UpdateCustomer(request.CustomerId, request.FirstName, request.LastName,
+        return await customerRepository.UpdateCustomer(request.CustomerId, request.FirstName, request.LastName,
             request.Company, request.Address, request.City, request.State,
            request.Conutry, request.PostalCode, request.Phone, request.Fax, request.Email, request.SupportRepId)
       ? Ok($"Пакупатель {request.CustomerId} обновлен")

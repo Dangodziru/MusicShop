@@ -2,270 +2,165 @@
 using Microsoft.Extensions.Configuration;
 using MusicShop.Domain;
 using MusicShop.Domain.Entities;
-using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MusicShop.Data.Dapper
 {
-    public class CustomerDapperRepositoty : ICustomerRepositoty
+    public class CustomerDapperRepository : ICustomerRepositoty
     {
         protected readonly string connectionString;
 
-        public CustomerDapperRepositoty(IConfiguration config)
+        public CustomerDapperRepository(IConfiguration config)
         {
             connectionString = config.GetConnectionString("MusicShop")!;
         }
 
-        public List<Customer> GetAll()
+        public async Task<IEnumerable<Customer>> GetAll()
         {
-            var customers = new List<Customer>();
-
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-                string sql = "SELECT * FROM Customer";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        customers.Add(new Customer
-                        {
-                            CustomerId = (long)reader["CustomerId"],
-                            FirstName = reader["FirstName"] as string,
-                            LastName = reader["LastName"] as string,
-                            Company = reader["Company"] as string,
-                            Address = reader["Address"] as string,
-                            City = reader["City"] as string,
-                            State = reader["State"] as string,
-                            Country = reader["Country"] as string,
-                            PostalCode = reader["PostalCode"] as string,
-                            Phone = reader["Phone"] as string,
-                            Fax = reader["Fax"] as string,
-                            Email = reader["Email"] as string,
-                            SupportRepId = reader["SupportRepId"] as long?
-                        });
-                    }
-                }
+                await connection.OpenAsync();
+                return await connection.QueryAsync<Customer>("SELECT * FROM Customer");
             }
-            return customers;
         }
 
-        public Customer? Get(long customerId)
+        public async Task<Customer?> Get(long customerId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-                string sql = "SELECT * FROM Customer WHERE CustomerId = @customerId";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return new Customer
-                            {
-                                CustomerId = (long)reader["CustomerId"],
-                                FirstName = reader["FirstName"] as string,
-                                LastName = reader["LastName"] as string,
-                                Company = reader["Company"] as string,
-                                Address = reader["Address"] as string,
-                                City = reader["City"] as string,
-                                State = reader["State"] as string,
-                                Country = reader["Country"] as string,
-                                PostalCode = reader["PostalCode"] as string,
-                                Phone = reader["Phone"] as string,
-                                Fax = reader["Fax"] as string,
-                                Email = reader["Email"] as string,
-                                SupportRepId = reader["SupportRepId"] as long?
-                            };
-                        }
-                    }
-                }
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<Customer>(
+                    "SELECT * FROM Customer WHERE CustomerId = @customerId",
+                    new { customerId }
+                );
             }
-            return null;
         }
 
-        public List<Customer> Search(string searchTerm)
+        public async Task<IEnumerable<Customer>> Search(string searchTerm)
         {
-            var customers = new List<Customer>();
-
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 string sql = @"
-                SELECT * FROM Customer 
-                WHERE FirstName LIKE '%' || @searchTerm || '%' 
-                   OR LastName LIKE '%' || @searchTerm || '%' 
-                   OR Email LIKE '%' || @searchTerm || '%'";
+                    SELECT * FROM Customer 
+                    WHERE FirstName LIKE '%' || @searchTerm || '%' 
+                       OR LastName LIKE '%' || @searchTerm || '%' 
+                       OR Email LIKE '%' || @searchTerm || '%'";
 
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@searchTerm", searchTerm);
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            customers.Add(new Customer
-                            {
-                                CustomerId = (long)reader["CustomerId"],
-                                FirstName = reader["FirstName"] as string,
-                                LastName = reader["LastName"] as string,
-                                Company = reader["Company"] as string,
-                                Address = reader["Address"] as string,
-                                City = reader["City"] as string,
-                                State = reader["State"] as string,
-                                Country = reader["Country"] as string,
-                                PostalCode = reader["PostalCode"] as string,
-                                Phone = reader["Phone"] as string,
-                                Fax = reader["Fax"] as string,
-                                Email = reader["Email"] as string,
-                                SupportRepId = reader["SupportRepId"] as long?
-                            });
-                        }
-                    }
-                }
+                return await connection.QueryAsync<Customer>(sql, new { searchTerm });
             }
-            return customers;
         }
 
-        public long? InsertCustomer(
+        public async Task<long?> InsertCustomer(
             string firstName, string lastName, string company,
             string address, string city, string state, string country,
             string postalCode, string phone, string fax, string email, long? supportRepId)
         {
+            var parameters = new DynamicParameters();
+            parameters.Add("@FirstName", firstName);
+            parameters.Add("@LastName", lastName);
+            parameters.Add("@Company", company, DbType.String);
+            parameters.Add("@Address", address, DbType.String);
+            parameters.Add("@City", city, DbType.String);
+            parameters.Add("@State", state, DbType.String);
+            parameters.Add("@Country", country, DbType.String);
+            parameters.Add("@PostalCode", postalCode, DbType.String);
+            parameters.Add("@Phone", phone, DbType.String);
+            parameters.Add("@Fax", fax, DbType.String);
+            parameters.Add("@Email", email, DbType.String);
+            parameters.Add("@SupportRepId", supportRepId, DbType.Int64);
+
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 string sql = @"
-                INSERT INTO Customer (
-                    FirstName, LastName, Company, Address, City, 
-                    State, Country, PostalCode, Phone, Fax, Email, SupportRepId
-                ) 
-                VALUES (
-                    @FirstName, @LastName, @Company, @Address, @City,
-                    @State, @Country, @PostalCode, @Phone, @Fax, @Email, @SupportRepId
-                );
-                SELECT last_insert_rowid();";
+                    INSERT INTO Customer (
+                        FirstName, LastName, Company, Address, City, 
+                        State, Country, PostalCode, Phone, Fax, Email, SupportRepId
+                    ) 
+                    VALUES (
+                        @FirstName, @LastName, @Company, @Address, @City,
+                        @State, @Country, @PostalCode, @Phone, @Fax, @Email, @SupportRepId
+                    );
+                    SELECT last_insert_rowid();";
 
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@FirstName", firstName);
-                    cmd.Parameters.AddWithValue("@LastName", lastName);
-                    cmd.Parameters.AddWithValue("@Company", company ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Address", address ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@City", city ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@State", state ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Country", country ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@PostalCode", postalCode ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Phone", phone ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Fax", fax ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Email", email ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@SupportRepId", supportRepId ?? (object)DBNull.Value);
-
-                    return (long?)cmd.ExecuteScalar();
-                }
+                return await connection.ExecuteScalarAsync<long?>(sql, parameters);
             }
         }
 
-        public bool DeleteCustomer(long customerId)
+        public async Task<bool> DeleteCustomer(long customerId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-                string sql = "DELETE FROM Customer WHERE CustomerId = @customerId";
-
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                await connection.OpenAsync();
+                int rowsAffected = await connection.ExecuteAsync(
+                    "DELETE FROM Customer WHERE CustomerId = @customerId",
+                    new { customerId }
+                );
+                return rowsAffected > 0;
             }
         }
 
-        public bool UpdateCustomer(
+        public async Task<bool> UpdateCustomer(
             long customerId, string firstName, string lastName, string company,
             string address, string city, string state, string country,
             string postalCode, string phone, string fax, string email, long? supportRepId)
         {
+            var parameters = new DynamicParameters();
+            parameters.Add("@CustomerId", customerId);
+            parameters.Add("@FirstName", firstName);
+            parameters.Add("@LastName", lastName);
+            parameters.Add("@Company", company, DbType.String);
+            parameters.Add("@Address", address, DbType.String);
+            parameters.Add("@City", city, DbType.String);
+            parameters.Add("@State", state, DbType.String);
+            parameters.Add("@Country", country, DbType.String);
+            parameters.Add("@PostalCode", postalCode, DbType.String);
+            parameters.Add("@Phone", phone, DbType.String);
+            parameters.Add("@Fax", fax, DbType.String);
+            parameters.Add("@Email", email, DbType.String);
+            parameters.Add("@SupportRepId", supportRepId, DbType.Int64);
+
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 string sql = @"
-                UPDATE Customer 
-                SET 
-                    FirstName = @FirstName,
-                    LastName = @LastName,
-                    Company = @Company,
-                    Address = @Address,
-                    City = @City,
-                    State = @State,
-                    Country = @Country,
-                    PostalCode = @PostalCode,
-                    Phone = @Phone,
-                    Fax = @Fax,
-                    Email = @Email,
-                    SupportRepId = @SupportRepId
-                WHERE CustomerId = @CustomerId";
+                    UPDATE Customer 
+                    SET 
+                        FirstName = @FirstName,
+                        LastName = @LastName,
+                        Company = @Company,
+                        Address = @Address,
+                        City = @City,
+                        State = @State,
+                        Country = @Country,
+                        PostalCode = @PostalCode,
+                        Phone = @Phone,
+                        Fax = @Fax,
+                        Email = @Email,
+                        SupportRepId = @SupportRepId
+                    WHERE CustomerId = @CustomerId";
 
-                using (var cmd = new SQLiteCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@CustomerId", customerId);
-                    cmd.Parameters.AddWithValue("@FirstName", firstName);
-                    cmd.Parameters.AddWithValue("@LastName", lastName);
-                    cmd.Parameters.AddWithValue("@Company", company ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Address", address ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@City", city ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@State", state ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Country", country ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@PostalCode", postalCode ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Phone", phone ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Fax", fax ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Email", email ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@SupportRepId", supportRepId ?? (object)DBNull.Value);
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                int rowsAffected = await connection.ExecuteAsync(sql, parameters);
+                return rowsAffected > 0;
             }
         }
-        public bool CustomerIsExist(string email)
+
+        public async Task<bool> CustomerIsExist(string email)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                connection.Open();
-
-                var existing = connection.QueryFirstOrDefault<Artist>(
-                    "SELECT * FROM Customer WHERE Email = @email;",
-                    new {email});
-
+                await connection.OpenAsync();
+                var existing = await connection.QueryFirstOrDefaultAsync<Customer>(
+                    "SELECT 1 FROM Customer WHERE Email = @email",
+                    new { email }
+                );
                 return existing != null;
-        }    }    
+            }
+        }
     }
 }

@@ -12,13 +12,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediator();
-builder.Services.AddTransient<artistRepository, ArtistDapperRepository>();
+builder.Services.AddTransient<IArtistRepository, ArtistDapperRepository>();
 builder.Services.AddTransient<IAlbumRepository, AlbumDapperRepository>();
 builder.Services.AddTransient<IGenreRepository, GenreDapperRepository>();
-builder.Services.AddTransient<ICustomerRepositoty, CustomerDapperRepositoty>();
+builder.Services.AddTransient<ICustomerRepositoty, CustomerDapperRepository>();
 builder.Services.AddTransient<IEmployeeRepository, EmployeeDapperRepository>();
 builder.Services.AddTransient<IMediaTypeRepository, MediaTypeDapperRepositiry>();
-
+builder.Services.AddTransient<IPlaylistRepository, PlaylistDapperRepository>();
 
 var app = builder.Build();
 

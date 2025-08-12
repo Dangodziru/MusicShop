@@ -4,12 +4,18 @@ namespace MusicShop.Domain
 {
     public interface ICustomerRepositoty
     {
-        bool DeleteCustomer(long customerId);
-        Customer? Get(long customerId);
-        List<Customer> GetAll();
-        long? InsertCustomer(string firstName, string lastName, string company, string address, string city, string state, string country, string postalCode, string phone, string fax, string email, long? supportRepId);
-        List<Customer> Search(string searchTerm);
-        bool UpdateCustomer(long customerId, string firstName, string lastName, string company, string address, string city, string state, string country, string postalCode, string phone, string fax, string email, long? supportRepId);
-        bool CustomerIsExist(string email);
+        Task<bool> DeleteCustomer(long customerId);
+        Task<Customer?> Get(long customerId);
+        Task<IEnumerable<Customer>> GetAll();
+        Task<long?> InsertCustomer(
+            string firstName, string lastName, string company,
+            string address, string city, string state, string country,
+            string postalCode, string phone, string fax, string email, long? supportRepId);
+        Task<IEnumerable<Customer>> Search(string searchTerm);
+        Task<bool> UpdateCustomer(
+            long customerId, string firstName, string lastName, string company,
+            string address, string city, string state, string country,
+            string postalCode, string phone, string fax, string email, long? supportRepId);
+        Task<bool> CustomerIsExist(string email);
     }
 }

@@ -5,6 +5,7 @@ using MusicShop.Domain;
 using MusicShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,24 +19,24 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet("All")]
-    public List<Employee> GetAll() => employeeRepository.GetAll();
+    public async Task<IEnumerable<Employee>> GetAll() => await employeeRepository.GetAll();
 
     [HttpGet("SearchById")]
-    public IActionResult Get([FromQuery] EmployeeGetRequest request)
+    public async Task<IActionResult> Get([FromQuery] EmployeeGetRequest request)
     {
-        var employee = employeeRepository.Get(request.EmployeeId);
+        var employee = await employeeRepository.Get(request.EmployeeId);
         return employee == null
             ? NotFound($"Сотрудник {request.EmployeeId} не найден")
             : Ok(employee);
     }
 
     [HttpGet("Search")]
-    public List<Employee> Search([FromQuery] EmployeeSearchRequest request) => employeeRepository.Search(request.SearchTerm);
+    public async Task<IEnumerable<Employee>> Search([FromQuery] EmployeeSearchRequest request) => await employeeRepository.Search(request.SearchTerm);
 
     [HttpPost("InsertEmployee")]
-    public IActionResult InsertEmployee(EmployeeInsertRequest request)
+    public async Task<IActionResult> InsertEmployee(EmployeeInsertRequest request)
     {
-        var newId = employeeRepository.InsertEmployee(
+        var newId = await employeeRepository.InsertEmployee(
             request.LastName,
             request.FirstName,
             request.Title,
@@ -63,17 +64,17 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpDelete("DeleteEmployee")]
-    public IActionResult DeleteEmployee(EmployeeDeleteRequest request)
+    public async Task<IActionResult> DeleteEmployee(EmployeeDeleteRequest request)
     {
-        return employeeRepository.DeleteEmployee(request.EmployeeId)
+        return await employeeRepository.DeleteEmployee(request.EmployeeId)
             ? Ok($"Сотрудник {request.EmployeeId} удален")
             : NotFound($"Сотрудник {request.EmployeeId} не найден");
     }
 
     [HttpPost("UpdateEmployee")]
-    public IActionResult UpdateEmployee(EmployeeUpdateRequest request)
+    public async Task<IActionResult> UpdateEmployee(EmployeeUpdateRequest request)
     {
-        var updated = employeeRepository.UpdateEmployee(
+        var updated = await employeeRepository.UpdateEmployee(
             request.EmployeeId,
             request.LastName,
             request.FirstName,

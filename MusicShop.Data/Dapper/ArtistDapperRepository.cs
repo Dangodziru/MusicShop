@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MusicShop.Data.Dapper
 {
-    public class ArtistDapperRepository : artistRepository
+    public class ArtistDapperRepository : IArtistRepository
     {
         protected readonly string connectionString;
 
