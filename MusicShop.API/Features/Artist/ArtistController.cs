@@ -32,13 +32,13 @@ public class ArtistController : ControllerBase
     }
 
     [HttpGet("Search")]
-    public Task<IEnumerable<Artist>> Search([FromQuery] ArtistSearchReqest request)
+    public Task<IEnumerable<Artist>> Search([FromQuery] ArtistSearchRequest request)
     {
         return artistRepository.Search(request.NameSearch);
     }
 
     [HttpPost("InsertArtist")]
-    public async Task<IActionResult> InsertArtist(ArtistInsertReqestcs request)
+    public async Task<IActionResult> InsertArtist(ArtistInsertRequests request)
     {
         bool artistExist = await artistRepository.ArtistIsExist(request.Name);
         if (artistExist)

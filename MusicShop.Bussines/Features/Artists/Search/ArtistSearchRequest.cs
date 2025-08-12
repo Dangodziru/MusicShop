@@ -2,7 +2,7 @@
 
 namespace MusicShop.Bussines.Features.Artists.Search
 {
-    public class ArtistSearchReqest
+    public class ArtistSearchRequest
     {
         [Required]
         [StringLength(100, MinimumLength = 3)]
