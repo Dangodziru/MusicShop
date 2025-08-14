@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MusicShop.Bussines.Features.Playlist.Search
+namespace MusicShop.Bussines.Features.Playlists.Search
 {
     public class PlaylistSearchRequest
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MusicShop.Bussines.Features.Playlist.Delete
+namespace MusicShop.Bussines.Features.Playlists.Delete
 {
     public class PlaylistDeleteRequest
     {

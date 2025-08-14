@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MusicShop.Data.Dapper;
 using MusicShop.Domain.Entities;
-using MusicShop.Bussines.Features.Playlist.Delete;
-using MusicShop.Bussines.Features.Playlist.Get;
-using MusicShop.Bussines.Features.Playlist.Insert;
-using MusicShop.Bussines.Features.Playlist.Search;
-using MusicShop.Bussines.Features.Playlist.Update;
+using MusicShop.Bussines.Features.Playlists.Delete;
+using MusicShop.Bussines.Features.Playlists.Get;
+using MusicShop.Bussines.Features.Playlists.Insert;
+using MusicShop.Bussines.Features.Playlists.Search;
+using MusicShop.Bussines.Features.Playlists.Update;
 
 namespace MusicShop.API.Features.Playlists
 {

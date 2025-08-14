@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MusicShop.Bussines.Features.Playlist.Update
+namespace MusicShop.Bussines.Features.Playlists.Update
 {
     public class PlaylistUpdateRequest
     {

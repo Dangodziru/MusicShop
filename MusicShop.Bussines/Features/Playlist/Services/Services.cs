@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicShop.Bussines.Features.Playlists.GetAll
+namespace MusicShop.Bussines.Features.Playlist.Services
 {
-    internal class GetAllPlaylistRequests
+    internal class Services
     {
     }
 }

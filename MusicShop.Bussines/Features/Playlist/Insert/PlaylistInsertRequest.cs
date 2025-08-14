@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MusicShop.Bussines.Features.Playlist.Insert
+namespace MusicShop.Bussines.Features.Playlists.Insert
 {
     public class PlaylistInsertRequest
     {

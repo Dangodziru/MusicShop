@@ -22,6 +22,7 @@ builder.Services.AddTransient<IMediaTypeRepository, MediaTypeDapperRepositiry>()
 builder.Services.AddTransient<IPlaylistRepository, PlaylistDapperRepository>();
 builder.Services.AddTransient<IArtistService, ArtistService>();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

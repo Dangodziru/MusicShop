@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MusicShop.Bussines.Features.Playlist.Get
+namespace MusicShop.Bussines.Features.Playlists.Get
 {
     public class PlaylistGetRequest
     {
