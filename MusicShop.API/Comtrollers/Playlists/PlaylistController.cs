@@ -1,78 +1,66 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MusicShop.Data.Dapper;
-using MusicShop.Domain.Entities;
 using MusicShop.Bussines.Features.Playlists.Delete;
 using MusicShop.Bussines.Features.Playlists.Get;
 using MusicShop.Bussines.Features.Playlists.Insert;
 using MusicShop.Bussines.Features.Playlists.Search;
 using MusicShop.Bussines.Features.Playlists.Update;
+using MusicShop.Bussines.Features.Playlist.Services;
 
 namespace MusicShop.API.Features.Playlists
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class PlaylistController : ControllerBase
     {
-        private readonly IPlaylistRepository playlistRepository;
+        private readonly IPlaylistService playlistService;
 
-        public PlaylistController(IPlaylistRepository playlistRepository)
+        public PlaylistController(IPlaylistService playlistService)
         {
-            this.playlistRepository = playlistRepository;
+            this.playlistService = playlistService;
         }
 
         [HttpGet("All")]
-        public async Task<IEnumerable<Playlist>> GetAll()
+        public async Task<IEnumerable<MusicShop.Domain.Entities.Playlist>> GetAll()
         {
-            return await playlistRepository.GetAll();
+            return await playlistService.GetAll();
         }
 
         [HttpGet("SearchById")]
         public async Task<IActionResult> Get([FromQuery] PlaylistGetRequest request)
         {
-            var artist = await playlistRepository.Get(request.PlaylistId);
-            return artist == null ? NotFound($"Плейлист {request.PlaylistId} не найден") : Ok(artist);
+            var playlist = await playlistService.Get(request);
+            return playlist == null ? NotFound($"Плейлист {request.PlaylistId} не найден") : Ok(playlist);
         }
 
         [HttpGet("Search")]
-        public Task<IEnumerable<Playlist>> Search([FromQuery] PlaylistSearchRequest request)
+        public async Task<IEnumerable<MusicShop.Domain.Entities.Playlist>> Search([FromQuery] PlaylistSearchRequest request)
         {
-            return playlistRepository.Search(request.Name);
+            return await playlistService.Search(request);
         }
 
         [HttpPost("InsertPlaylist")]
-        public async Task<IActionResult> InsertPlaylist(PlaylistInsertRequest request)
+        public async Task<IActionResult> InsertPlaylist([FromBody] PlaylistInsertRequest request)
         {
-            bool playlistExist = await playlistRepository.PlaylistIsExist(request.Name);
-            if (playlistExist)
-            {
-                return BadRequest("Такой плейлист уже существует");
-            }
-            var playlistId = await playlistRepository.InsertPlaylist(request.Name);
+            var playlistId = await playlistService.Insert(request);
             if (playlistId.HasValue)
             {
                 return Ok(new { PlaylistId = playlistId });
             }
-            else
-            {
-                return BadRequest("Не удалось создать плейлист");
-            }
-        }
-
-        [HttpDelete("DeletePlaylist")]
-        public async Task<IActionResult> DeletePlaylist(PlaylistDeleteRequest request)
-        {
-            return await playlistRepository.DeletePlaylist(request.PlaylistId)
-                ? Ok($"Пдейлист {request.PlaylistId} удален")
-                : NotFound($"Плейлист {request.PlaylistId} не найден");
+            return BadRequest("Не удалось создать плейлист или такой плейлист уже существует");
         }
 
         [HttpPost("UpdatePlaylist")]
-        public async Task<IActionResult> UpdatePlaylist(PlaylistUpdateRequest request)
+        public async Task<IActionResult> UpdatePlaylist([FromBody] PlaylistUpdateRequest request)
         {
-            return await playlistRepository.UpdatePlaylist(request.PlaylistId, request.Name)
-                ? Ok($"Исполнитель {request.PlaylistId} обновлен")
-                : NotFound($"Исполнитель {request.PlaylistId} не найден");
+            var success = await playlistService.Update(request);
+            return success ? Ok($"Плейлист {request.PlaylistId} обновлен") : BadRequest($"Не удалось обновить плейлист {request.PlaylistId}");
+        }
+
+        [HttpDelete("DeletePlaylist")]
+        public async Task<IActionResult> DeletePlaylist([FromQuery] PlaylistDeleteRequest request)
+        {
+            var success = await playlistService.Delete(request);
+            return success ? Ok($"Плейлист {request.PlaylistId} удален") : NotFound($"Плейлист {request.PlaylistId} не найден");
         }
     }
 }

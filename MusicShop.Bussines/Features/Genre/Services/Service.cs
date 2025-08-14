@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicShop.Bussines.Features.Playlist.Services
+namespace MusicShop.Bussines.Features.Genre.Services
 {
-    internal class Services
+    internal class Service
     {
     }
 }
