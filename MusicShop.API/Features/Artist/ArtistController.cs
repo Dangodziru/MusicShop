@@ -3,6 +3,7 @@ using MusicShop.Bussines.Features.Artists.Delete;
 using MusicShop.Bussines.Features.Artists.Get;
 using MusicShop.Bussines.Features.Artists.Insert;
 using MusicShop.Bussines.Features.Artists.Search;
+using MusicShop.Bussines.Features.Artists.Service;
 using MusicShop.Bussines.Features.Artists.Update;
 using MusicShop.Data;
 using MusicShop.Domain.Entities;
@@ -11,64 +12,54 @@ using MusicShop.Domain.Entities;
 [Route("api/[controller]")]
 public class ArtistController : ControllerBase
 {
-    private readonly IArtistRepository artistRepository;
+    private readonly IArtistService artistService;
 
-    public ArtistController(IArtistRepository artistRepository)
+    public ArtistController(IArtistRepository artistRepository, IArtistService artistService)
     {
-        this.artistRepository = artistRepository;
+        this.artistService = artistService;
     }
 
     [HttpGet("All")]
     public async Task<IEnumerable<Artist>> GetAll()
     {
-        return await artistRepository.GetAll();
+        return await artistService.GetAll();
     }
 
     [HttpGet("SearchById")]
     public async Task<IActionResult> Get([FromQuery] ArtistGetRequest request)
     {
-        var artist = await artistRepository.Get(request.ArtistId);
+        var artist = await artistService.Get(request);
         return artist == null ? NotFound($"Исполнитель {request.ArtistId} не найден") : Ok(artist);
     }
 
     [HttpGet("Search")]
-    public Task<IEnumerable<Artist>> Search([FromQuery] ArtistSearchRequest request)
+    public async Task<IEnumerable<Artist>> Search([FromQuery] ArtistSearchRequest request)
     {
-        return artistRepository.Search(request.NameSearch);
+        return await artistService.Search(request);
     }
 
     [HttpPost("InsertArtist")]
-    public async Task<IActionResult> InsertArtist(ArtistInsertRequests request)
+    public async Task<IActionResult> InsertArtist([FromBody] ArtistInsertRequests request)
     {
-        bool artistExist = await artistRepository.ArtistIsExist(request.Name);
-        if (artistExist)
-        {
-            return BadRequest("Такой исполнитель уже существует");
-        }
-        var artistId = await artistRepository.InsertArtist(request.Name);
+        var artistId = await artistService.Insert(request);
         if (artistId.HasValue)
         {
             return Ok(new { ArtistId = artistId });
         }
-        else
-        {
-            return BadRequest("Не удалось создать исполнителя");
-        }
-    }
-
-    [HttpDelete("DeleteArtist")]
-    public async Task<IActionResult> DeleteArtist(ArtistDeleteRequest request)
-    {
-        return await artistRepository.DeleteArtist(request.ArtistId)
-            ? Ok($"Исполнитель {request.ArtistId} удален")
-            : NotFound($"Исполнитель {request.ArtistId} не найден");
+        return BadRequest("Не удалось создать исполнителя или такой исполнитель уже существует");
     }
 
     [HttpPost("UpdateArtist")]
-    public async Task<IActionResult> UpdateArtist(ArtistUpdateRequest request)
+    public async Task<IActionResult> UpdateArtist([FromBody] ArtistUpdateRequest request)
     {
-        return await artistRepository.UpdateArtist(request.ArtistId, request.Name)
-            ? Ok($"Исполнитель {request.ArtistId} обновлен")
-            : NotFound($"Исполнитель {request.ArtistId} не найден");
+        var success = await artistService.Update(request);
+        return success ? Ok($"Исполнитель {request.ArtistId} обновлен") : BadRequest($"Не удалось обновить исполнителя {request.ArtistId}");
+    }
+
+    [HttpDelete("DeleteArtist")]
+    public async Task<IActionResult> DeleteArtist([FromQuery] ArtistDeleteRequest request)
+    {
+        var success = await artistService.Delete(request);
+        return success ? Ok($"Исполнитель {request.ArtistId} удален") : NotFound($"Исполнитель {request.ArtistId} не найден");
     }
 }

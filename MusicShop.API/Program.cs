@@ -1,3 +1,4 @@
+using MusicShop.Bussines.Features.Artists.Service;
 using MusicShop.Data;
 using MusicShop.Data.Dapper;
 using MusicShop.Domain;
@@ -19,6 +20,7 @@ builder.Services.AddTransient<ICustomerRepositoty, CustomerDapperRepository>();
 builder.Services.AddTransient<IEmployeeRepository, EmployeeDapperRepository>();
 builder.Services.AddTransient<IMediaTypeRepository, MediaTypeDapperRepositiry>();
 builder.Services.AddTransient<IPlaylistRepository, PlaylistDapperRepository>();
+builder.Services.AddTransient<IArtistService, ArtistService>();
 
 var app = builder.Build();
 

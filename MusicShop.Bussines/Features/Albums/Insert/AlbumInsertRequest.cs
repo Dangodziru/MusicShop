@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Mediator;
+using MusicShop.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace MusicShop.Bussines.Features.Albums.Insert
 {
-    public class AlbumInsertRequest
+    public class AlbumInsertRequest : IRequest<Album?>
     {
         [Range(1, long.MaxValue, ErrorMessage = "Введено неверное значение")]
         public long ArtistId { get; set; }
