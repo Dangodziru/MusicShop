@@ -32,7 +32,7 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async Task<Album?> Get(long albumId)
+        public async Task<Album?> Get(int albumId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -46,7 +46,7 @@ namespace MusicShop.Data.Dapper
                     map: (album, artist) =>
                     {
                         album.Artist = artist;
-                        album.Id = albumId;
+                        album.AlbumId = albumId;
                         return album;
                     },
                     param: new { albumId },
@@ -67,19 +67,19 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public virtual async Task<long?> InsertAlbum(string title, long artistId)
+        public virtual async Task<int?> InsertAlbum(string title, int artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 await connection.OpenAsync();
-                return connection.ExecuteScalar<long?>(
+                return connection.ExecuteScalar<int?>(
                     "INSERT INTO Album(title, ArtistId) VALUES(@title, @artistId); SELECT last_insert_rowid();",
                     new { title, artistId }
                 );
             }
         }
 
-        public async Task<bool> DeleteAlbum(long albumId)
+        public async Task<bool> DeleteAlbum(int albumId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -92,7 +92,7 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async Task<bool> UpdateAlbum(long albumId, string title, long artistId)
+        public async Task<bool> UpdateAlbum(int albumId, string title, int artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -106,7 +106,7 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async Task<bool> AlbumIsExist(string title, long artistId)
+        public async Task<bool> AlbumIsExist(string title, int artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {

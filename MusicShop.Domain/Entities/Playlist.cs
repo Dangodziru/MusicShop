@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MusicShop.Domain.Entities
+namespace MusicShop.Domain.Entities;
+
+public partial class Playlist
 {
-    public class Playlist
-    {
-        public long PlaylistId { get; set; }
+    public long PlaylistId { get; set; }
 
-        public string Name { get; set; }
-    }
+    public string? Name { get; set; }
+
+    public virtual ICollection<Track> Tracks { get; set; } = new List<Track>();
 }

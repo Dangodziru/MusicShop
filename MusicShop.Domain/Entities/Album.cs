@@ -1,12 +1,17 @@
-﻿namespace MusicShop.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 
-public class Album
+namespace MusicShop.Domain.Entities;
+
+public partial class Album
 {
-    public long Id { get; set; }
+    public int AlbumId { get; set; }
 
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
 
-    public long ArtistId { get; set; }
+    public int ArtistId { get; set; }
 
-    public Artist? Artist { get; set; }
+    public virtual Artist Artist { get; set; } = null!;
+
+    public virtual ICollection<Track> Tracks { get; set; } = new List<Track>();
 }

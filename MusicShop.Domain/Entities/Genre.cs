@@ -1,7 +1,13 @@
-﻿namespace MusicShop.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 
-public class Genre
+namespace MusicShop.Domain.Entities;
+
+public partial class Genre
 {
-    public long GenreId { get; set; }
-    public string Name { get; set; }
+    public int GenreId { get; set; }
+
+    public string? Name { get; set; }
+
+    public virtual ICollection<Track> Tracks { get; set; } = new List<Track>();
 }

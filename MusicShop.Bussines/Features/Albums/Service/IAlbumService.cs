@@ -10,7 +10,7 @@ namespace MusicShop.Bussines.Features.Albums.Service
     {
         Task<bool> Delete(AlbumDeleteRequest request);
         Task<IEnumerable<Album>> GetAll();
-        Task<long?> Insert(AlbumInsertRequest request);
+        Task<int?> Insert(AlbumInsertRequest request);
         Task<IEnumerable<Album>> Search(AlbumSearchRequest request);
         Task<bool> Update(AlbumUpdateRequest request);
     }

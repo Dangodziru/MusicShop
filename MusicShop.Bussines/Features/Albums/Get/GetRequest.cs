@@ -6,7 +6,7 @@ namespace MusicShop.Bussines.Features.Albums.Get
 {
     public class GetRequest : IRequest<Album?>
     {
-        [Range(1, long.MaxValue,ErrorMessage = "Введено неверное значение")]
-        public long AlbumId { get; set; }
+        [Range(1, int.MaxValue,ErrorMessage = "Введено неверное значение")]
+        public int AlbumId { get; set; }
     }
 }

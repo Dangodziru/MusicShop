@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MusicShop.DataEntity;
+namespace MusicShop.Domain.Entities;
 
 public partial class InvoiceLine
 {
@@ -13,7 +13,7 @@ public partial class InvoiceLine
 
     public double UnitPrice { get; set; }
 
-    public int Quantity { get; set; }
+    public long Quantity { get; set; }
 
     public virtual Invoice Invoice { get; set; } = null!;
 

@@ -12,7 +12,7 @@ namespace MusicShop.Bussines.Features.Artists.Service
         Task<IEnumerable<Artist>> GetAll();
         Task<Artist?> Get(ArtistGetRequest request);
         Task<IEnumerable<Artist>> Search(ArtistSearchRequest request);
-        Task<long?> Insert(ArtistInsertRequests request);
+        Task<int?> Insert(ArtistInsertRequests request);
         Task<bool> Update(ArtistUpdateRequest request);
         Task<bool> Delete(ArtistDeleteRequest request);
     }

@@ -33,7 +33,7 @@ namespace MusicShop.Bussines.Features.Artists.Service
             return await artistRepository.Search(request.NameSearch);
         }
 
-        public async Task<long?> Insert(ArtistInsertRequests request)
+        public async Task<int?> Insert(ArtistInsertRequests request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
             {

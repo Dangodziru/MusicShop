@@ -1,9 +1,13 @@
-﻿namespace MusicShop.Domain.Entities
-{
-    public class MediaType
-    {
-        public long MediaTypeId { get; set; }
+﻿using System;
+using System.Collections.Generic;
 
-        public string Name{ get; set; }
-    }
+namespace MusicShop.Domain.Entities;
+
+public partial class MediaType
+{
+    public int MediaTypeId { get; set; }
+
+    public string? Name { get; set; }
+
+    public virtual ICollection<Track> Tracks { get; set; } = new List<Track>();
 }

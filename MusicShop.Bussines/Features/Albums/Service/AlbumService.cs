@@ -24,7 +24,7 @@ namespace MusicShop.Bussines.Features.Albums.Service
             return await albumRepository.Search(request.TitleSearch);
         }
 
-        public async Task<long?> Insert(AlbumInsertRequest request)
+        public async Task<int?> Insert(AlbumInsertRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Title) || request.ArtistId <= 0)
             {

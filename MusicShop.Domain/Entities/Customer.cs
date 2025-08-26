@@ -1,16 +1,19 @@
-﻿namespace MusicShop.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 
-public class Customer
+namespace MusicShop.Domain.Entities;
+
+public partial class Customer
 {
-    public long CustomerId { get; set; }
+    public int CustomerId { get; set; }
 
-    public string FirstName { get; set; }
+    public string FirstName { get; set; } = null!;
 
-    public string LastName { get; set; }
+    public string LastName { get; set; } = null!;
 
     public string? Company { get; set; }
 
-    public string Address { get; set; }
+    public string? Address { get; set; }
 
     public string? City { get; set; }
 
@@ -24,7 +27,11 @@ public class Customer
 
     public string? Fax { get; set; }
 
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
-    public long? SupportRepId { get; set; }
+    public int? SupportRepId { get; set; }
+
+    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+
+    public virtual Employee? SupportRep { get; set; }
 }

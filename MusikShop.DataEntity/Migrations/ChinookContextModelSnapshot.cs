@@ -17,7 +17,7 @@ namespace MusicShop.DataEntity.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
 
-            modelBuilder.Entity("MusicShop.DataEntity.Album", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Album", b =>
                 {
                     b.Property<int>("AlbumId")
                         .HasColumnType("INTEGER");
@@ -36,7 +36,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Album", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Artist", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Artist", b =>
                 {
                     b.Property<int>("ArtistId")
                         .HasColumnType("INTEGER");
@@ -49,7 +49,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Artist", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Customer", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
@@ -100,7 +100,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Customer", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Employee", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Employee", b =>
                 {
                     b.Property<int>("EmployeeId")
                         .HasColumnType("INTEGER");
@@ -156,7 +156,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Employee", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Genre", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Genre", b =>
                 {
                     b.Property<int>("GenreId")
                         .HasColumnType("INTEGER");
@@ -169,7 +169,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Genre", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Invoice", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Invoice", b =>
                 {
                     b.Property<int>("InvoiceId")
                         .HasColumnType("INTEGER");
@@ -205,7 +205,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Invoice", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.InvoiceLine", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.InvoiceLine", b =>
                 {
                     b.Property<int>("InvoiceLineId")
                         .HasColumnType("INTEGER");
@@ -213,7 +213,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.Property<int>("InvoiceId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Quantity")
+                    b.Property<long>("Quantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TrackId")
@@ -231,7 +231,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("InvoiceLine", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.MediaType", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.MediaType", b =>
                 {
                     b.Property<int>("MediaTypeId")
                         .HasColumnType("INTEGER");
@@ -244,9 +244,9 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("MediaType", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Playlist", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Playlist", b =>
                 {
-                    b.Property<int>("PlaylistId")
+                    b.Property<long>("PlaylistId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -257,7 +257,7 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("Playlist", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Track", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Track", b =>
                 {
                     b.Property<int>("TrackId")
                         .HasColumnType("INTEGER");
@@ -300,7 +300,7 @@ namespace MusicShop.DataEntity.Migrations
 
             modelBuilder.Entity("PlaylistTrack", b =>
                 {
-                    b.Property<int>("PlaylistId")
+                    b.Property<long>("PlaylistId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TrackId")
@@ -313,9 +313,9 @@ namespace MusicShop.DataEntity.Migrations
                     b.ToTable("PlaylistTrack", (string)null);
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Album", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Album", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Artist", "Artist")
+                    b.HasOne("MusicShop.Domain.Entities.Artist", "Artist")
                         .WithMany("Albums")
                         .HasForeignKey("ArtistId")
                         .IsRequired();
@@ -323,27 +323,27 @@ namespace MusicShop.DataEntity.Migrations
                     b.Navigation("Artist");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Customer", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Employee", "SupportRep")
+                    b.HasOne("MusicShop.Domain.Entities.Employee", "SupportRep")
                         .WithMany("Customers")
                         .HasForeignKey("SupportRepId");
 
                     b.Navigation("SupportRep");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Employee", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Employee", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Employee", "ReportsToNavigation")
+                    b.HasOne("MusicShop.Domain.Entities.Employee", "ReportsToNavigation")
                         .WithMany("InverseReportsToNavigation")
                         .HasForeignKey("ReportsTo");
 
                     b.Navigation("ReportsToNavigation");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Invoice", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Invoice", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Customer", "Customer")
+                    b.HasOne("MusicShop.Domain.Entities.Customer", "Customer")
                         .WithMany("Invoices")
                         .HasForeignKey("CustomerId")
                         .IsRequired();
@@ -351,14 +351,14 @@ namespace MusicShop.DataEntity.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.InvoiceLine", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.InvoiceLine", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Invoice", "Invoice")
+                    b.HasOne("MusicShop.Domain.Entities.Invoice", "Invoice")
                         .WithMany("InvoiceLines")
                         .HasForeignKey("InvoiceId")
                         .IsRequired();
 
-                    b.HasOne("MusicShop.DataEntity.Track", "Track")
+                    b.HasOne("MusicShop.Domain.Entities.Track", "Track")
                         .WithMany("InvoiceLines")
                         .HasForeignKey("TrackId")
                         .IsRequired();
@@ -368,17 +368,17 @@ namespace MusicShop.DataEntity.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Track", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Track", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Album", "Album")
+                    b.HasOne("MusicShop.Domain.Entities.Album", "Album")
                         .WithMany("Tracks")
                         .HasForeignKey("AlbumId");
 
-                    b.HasOne("MusicShop.DataEntity.Genre", "Genre")
+                    b.HasOne("MusicShop.Domain.Entities.Genre", "Genre")
                         .WithMany("Tracks")
                         .HasForeignKey("GenreId");
 
-                    b.HasOne("MusicShop.DataEntity.MediaType", "MediaType")
+                    b.HasOne("MusicShop.Domain.Entities.MediaType", "MediaType")
                         .WithMany("Tracks")
                         .HasForeignKey("MediaTypeId")
                         .IsRequired();
@@ -392,55 +392,55 @@ namespace MusicShop.DataEntity.Migrations
 
             modelBuilder.Entity("PlaylistTrack", b =>
                 {
-                    b.HasOne("MusicShop.DataEntity.Playlist", null)
+                    b.HasOne("MusicShop.Domain.Entities.Playlist", null)
                         .WithMany()
                         .HasForeignKey("PlaylistId")
                         .IsRequired();
 
-                    b.HasOne("MusicShop.DataEntity.Track", null)
+                    b.HasOne("MusicShop.Domain.Entities.Track", null)
                         .WithMany()
                         .HasForeignKey("TrackId")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Album", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Album", b =>
                 {
                     b.Navigation("Tracks");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Artist", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Artist", b =>
                 {
                     b.Navigation("Albums");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Customer", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Invoices");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Employee", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Employee", b =>
                 {
                     b.Navigation("Customers");
 
                     b.Navigation("InverseReportsToNavigation");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Genre", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Genre", b =>
                 {
                     b.Navigation("Tracks");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Invoice", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Invoice", b =>
                 {
                     b.Navigation("InvoiceLines");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.MediaType", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.MediaType", b =>
                 {
                     b.Navigation("Tracks");
                 });
 
-            modelBuilder.Entity("MusicShop.DataEntity.Track", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Track", b =>
                 {
                     b.Navigation("InvoiceLines");
                 });

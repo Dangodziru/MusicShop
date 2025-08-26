@@ -25,7 +25,7 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async Task<Artist?> Get(long artistId)
+        public async Task<Artist?> Get(int artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -47,18 +47,18 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async virtual Task<long?> InsertArtist(string name)
+        public async virtual Task<int?> InsertArtist(string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
-                return await connection.ExecuteScalarAsync<long?>(
+                return await connection.ExecuteScalarAsync<int?>(
                     "INSERT INTO Artist (Name) VALUES (@name); SELECT last_insert_rowid();",
                     new { name }
                 );
             }
         }
 
-        public async Task<bool> DeleteArtist(long artistId)
+        public async Task<bool> DeleteArtist(int artistId)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -70,7 +70,7 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async Task<bool> UpdateArtist(long artistId, string name)
+        public async Task<bool> UpdateArtist(int artistId, string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
