@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicShop.Tests", "MusicSho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicShop.Bussines", "MusicShop.Bussines\MusicShop.Bussines.csproj", "{0EEE0F4E-544C-4532-8415-15143F72EF20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicShop.DataEntity", "MusikShop.DataEntity\MusicShop.DataEntity.csproj", "{8BC7BFB1-C7EB-4BB5-AF98-DF66F3D4DB0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{0EEE0F4E-544C-4532-8415-15143F72EF20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EEE0F4E-544C-4532-8415-15143F72EF20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EEE0F4E-544C-4532-8415-15143F72EF20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC7BFB1-C7EB-4BB5-AF98-DF66F3D4DB0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC7BFB1-C7EB-4BB5-AF98-DF66F3D4DB0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC7BFB1-C7EB-4BB5-AF98-DF66F3D4DB0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC7BFB1-C7EB-4BB5-AF98-DF66F3D4DB0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
