@@ -11,7 +11,7 @@ namespace MusicShop.Bussines.Features.Albums.Update
         public long ArtistId { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Длинна должнабыть больше 3х семиволов и меньше 100")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Длина должнабыть больше 3-х семиволов и меньше 100")]
         public string Title { get; set; }
     }
 }

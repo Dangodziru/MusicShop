@@ -48,24 +48,24 @@ namespace MusicShop.Data.Dapper
             }
         }
 
-        public async Task<long?> Insert(Genre genre)
+        public async Task<long?> Insert(string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 return await connection.ExecuteScalarAsync<long?>(
                     "INSERT INTO Genre (Name) VALUES (@Name); SELECT last_insert_rowid();",
-                    new { genre.Name }
+                    new {name}
                 );
             }
         }
 
-        public async Task<bool> Update(Genre genre)
+        public async Task<bool> Update(long genreId, string name)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 int affectedRows = await connection.ExecuteAsync(
                     "UPDATE Genre SET Name = @Name WHERE GenreId = @GenreId",
-                    new { genre.GenreId, genre.Name }
+                    new {genreId, name }
                 );
                 return affectedRows > 0;
             }

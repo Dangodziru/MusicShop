@@ -6,7 +6,7 @@ using MusicShop.Bussines.Features.MediaType.Update;
 
 namespace MusicShop.Bussines.Features.MediaType.Services
 {
-    internal interface IMediaTypeService
+    public interface IMediaTypeService
     {
         Task<bool> Delete(MediaTypeDeleteRequest request);
         Task<Domain.Entities.MediaType?> Get(MediaTypeGetRequest request);

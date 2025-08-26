@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MusicShop.Bussines.Features.Artists.Insert
+namespace MusicShop.Bussines.Features.Genre.Search
 {
-    public class ArtistInsertRequests
+    public class GenreSearchRequests
     {
-        [Required]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Длина должнабыть больше 3-х семиволов и меньше 100")]
-        public string Name { get; set; }
+        public string Term { get; set; }
     }
 }

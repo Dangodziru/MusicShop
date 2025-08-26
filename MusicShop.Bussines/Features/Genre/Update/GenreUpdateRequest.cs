@@ -8,7 +8,7 @@ namespace MusicShop.Bussines.Features.Genre.Update
         public long GenreId { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Длинна должнабыть больше 3х семиволов и меньше 100")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Длина должна быть больше 3-х символов и меньше 100")]
         public string Name { get; set; }
     }
 }
